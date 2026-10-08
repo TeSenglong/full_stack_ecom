@@ -5,6 +5,13 @@ import { cookies } from "next/headers";
 
 const API_TIMEOUT_MS = 5_000;
 
+const PRODUCT_LIST_TIMEOUT_MS = 30_000;
+const PRODUCT_LIST_MAX_ATTEMPTS = 3;
+const PRODUCT_LIST_RETRY_DELAY_MS = 2_000;
+
+function wait(milliseconds: number) {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
+}
 function getProductsUrl() {
   return `${getBackendUrl()}/products`;
 }
@@ -18,17 +25,37 @@ async function parseResponse<T>(response: Response, message: string): Promise<T>
 }
 
 export async function getProducts(): Promise<Product[]> {
-  const response = await fetch(getProductsUrl(), {
-    cache: "no-store",
-    signal: AbortSignal.timeout(API_TIMEOUT_MS),
-  });
+  let lastError: unknown;
 
-  const page = await parseResponse<ProductPage>(
-    response,
-    "Failed to fetch products",
-  );
+  for (
+    let attempt = 1;
+    attempt <= PRODUCT_LIST_MAX_ATTEMPTS;
+    attempt++
+  ) {
+    try {
+      const response = await fetch(getProductsUrl(), {
+        cache: "no-store",
+        signal: AbortSignal.timeout(PRODUCT_LIST_TIMEOUT_MS),
+      });
 
-  return page.content;
+      const page = await parseResponse<ProductPage>(
+        response,
+        "Failed to fetch products",
+      );
+
+      return page.content;
+    } catch (error) {
+      lastError = error;
+
+      if (attempt < PRODUCT_LIST_MAX_ATTEMPTS) {
+        await wait(PRODUCT_LIST_RETRY_DELAY_MS);
+      }
+    }
+  }
+
+  throw lastError instanceof Error
+    ? lastError
+    : new Error("Unable to load products");
 }
 
 export async function getProductPage(

@@ -1,7 +1,7 @@
 "use client";
 
 /* eslint-disable @next/next/no-img-element */
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 
 interface ProgressiveImageProps {
   src: string;
@@ -14,19 +14,19 @@ export default function ProgressiveImage({
   alt,
   className = "",
 }: ProgressiveImageProps) {
-  const imageRef = useRef<HTMLImageElement>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
 
-  useEffect(() => {
-    setIsLoaded(false);
+  const isLoaded = loadedSrc === src;
 
-    const image = imageRef.current;
-
-    // The image may have loaded from cache before React attached onLoad.
-    if (image?.complete && image.naturalWidth > 0) {
-      setIsLoaded(true);
-    }
-  }, [src]);
+  const handleImageRef = useCallback(
+    (image: HTMLImageElement | null) => {
+      // Handle images loaded from cache before onLoad is attached.
+      if (image?.complete && image.naturalWidth > 0) {
+        setLoadedSrc(src);
+      }
+    },
+    [src],
+  );
 
   return (
     <div
@@ -37,11 +37,11 @@ export default function ProgressiveImage({
       )}
 
       <img
-        ref={imageRef}
+        ref={handleImageRef}
         src={src}
         alt={alt}
         loading="lazy"
-        onLoad={() => setIsLoaded(true)}
+        onLoad={() => setLoadedSrc(src)}
         className={`h-full w-full object-cover transition-opacity duration-500 ease-out ${
           isLoaded ? "opacity-100" : "opacity-0"
         }`}
