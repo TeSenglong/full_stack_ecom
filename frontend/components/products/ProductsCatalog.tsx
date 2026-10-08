@@ -154,7 +154,7 @@ export default function ProductsCatalog({
             prefetch={false}
             className="rounded bg-[#f4f0e9] px-6 py-3 text-sm font-semibold text-[#26332c] transition-colors hover:bg-white"
           >
-            Discover our atelier
+            Discover MOHAORI
           </Link>
         </div>
       </section>

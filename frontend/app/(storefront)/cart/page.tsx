@@ -5,8 +5,8 @@ import CustomerCartPage from "@/components/cart/CustomerCartPage";
 import { getServerCurrentUser } from "@/lib/auth/server";
 
 export const metadata: Metadata = {
-  title: "Your Shopping Bag | Atelier & Co.",
-  description: "Review the pieces in your Atelier & Co. shopping bag.",
+  title: "Your Shopping Bag | MOHAORI",
+  description: "Review the pieces in your MOHAORI shopping bag.",
 };
 
 export default async function CartPage() {

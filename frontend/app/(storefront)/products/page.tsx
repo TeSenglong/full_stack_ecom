@@ -5,8 +5,8 @@ import { getProducts } from "@/lib/api/products";
 import type { Product } from "@/types/product";
 
 export const metadata: Metadata = {
-  title: "The Collection | Atelier & Co.",
-  description: "Explore the complete Atelier & Co. collection of considered objects for modern living.",
+  title: "The Collection | MOHAORI",
+  description: "Explore the complete MOHAORI collection of considered objects for modern living.",
 };
 
 interface ProductsPageProps {

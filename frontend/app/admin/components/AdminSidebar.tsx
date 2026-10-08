@@ -65,7 +65,7 @@ export function AdminSidebar({
               render={<Link href="/admin" />}
             >
               <span className="font-serif text-base font-semibold">
-                Atelier &amp; Co.
+                MOHAORI
               </span>
             </SidebarMenuButton>
           </SidebarMenuItem>

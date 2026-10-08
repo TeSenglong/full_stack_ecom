@@ -281,7 +281,7 @@ export default function HomePage({ productsPromise }: HomePageProps) {
               >
                 <Image
                   src={HOME_HERO_IMAGE}
-                  alt="ATELIER & CO. fashion collection"
+                  alt="MOHAORI fashion collection"
                   fill
                   preload
                   sizes="(min-width: 1400px) 650px, (min-width: 1024px) 50vw, 100vw"

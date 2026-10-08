@@ -5,8 +5,8 @@ import CustomerAccountPage from "@/components/account/CustomerAccountPage";
 import { getServerCurrentUser } from "@/lib/auth/server";
 
 export const metadata: Metadata = {
-  title: "My Account | Atelier & Co.",
-  description: "Manage your Atelier & Co. customer account and orders.",
+  title: "My Account | MOHAORI",
+  description: "Manage your MOHAORI customer account and orders.",
 };
 
 export default async function AccountPage() {

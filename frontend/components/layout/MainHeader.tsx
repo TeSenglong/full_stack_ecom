@@ -86,7 +86,7 @@ export default function MainHeader() {
           href="/"
           className="font-serif text-[24px] font-semibold tracking-tight text-primary"
         >
-          ATELIER &amp; CO.
+          MOHAORI
         </Link>
 
         <nav className="hidden items-center gap-6 lg:flex" aria-label="Main navigation">

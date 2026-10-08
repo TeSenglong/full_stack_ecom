@@ -11,7 +11,7 @@ export default function AboutHero() {
             <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-[#ffb59d]">Self Initiated Project full-stack E-Commerce</span>
           </div>
           <h1 className="max-w-xl font-serif text-5xl font-semibold leading-[1.02] tracking-tight md:text-7xl">Next JS, Spring Boot & Postgresql</h1>
-          <p className="mt-7 max-w-lg text-[17px] leading-relaxed text-on-brand/80">Atelier &amp; Co. is a full-stack e-commerce platform built with Next JS, Spring Boot and Postgresql. It is a platform for buying and selling products.</p>
+          <p className="mt-7 max-w-lg text-[17px] leading-relaxed text-on-brand/80">MOHAORI is a full-stack e-commerce platform built with Next JS, Spring Boot and PostgreSQL. It is a platform for buying and selling products.</p>
           <div className="mt-9 flex flex-wrap gap-4">
             <Link href="/products" className="rounded bg-[#f4f0e9] px-6 py-3 text-sm font-semibold text-[#26332c]">Explore the production page</Link>
             <a href="#story" className="flex items-center gap-2 px-2 py-3 text-sm font-semibold">Read our story <span className="material-symbols-outlined text-[17px]">south</span></a>

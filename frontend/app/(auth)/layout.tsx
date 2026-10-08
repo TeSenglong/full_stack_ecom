@@ -20,7 +20,7 @@ export default function AuthLayout({
               <ShoppingBag className="size-4" />
             </span>
 
-            ATELIER &amp; CO.
+            MOHAORI
           </Link>
 
           {children}

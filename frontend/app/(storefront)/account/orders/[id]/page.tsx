@@ -5,7 +5,7 @@ import CustomerOrderDetails from "@/components/account/CustomerOrderDetails";
 import { getServerCurrentUser } from "@/lib/auth/server";
 
 export const metadata: Metadata = {
-  title: "Order Details | Atelier & Co.",
+  title: "Order Details | MOHAORI",
 };
 
 export default async function CustomerOrderPage({

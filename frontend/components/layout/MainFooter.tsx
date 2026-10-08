@@ -16,7 +16,7 @@ export default function MainFooter() {
         <div className="mb-24 flex flex-col gap-6 rounded bg-surface-container/60 p-8 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-xl">
             <span className="text-[11px] uppercase tracking-[0.12em] text-secondary">Exclusive Communiqué</span>
-            <h3 className="mt-1 font-serif text-[26px] font-semibold text-primary">Join the Atelier Circle</h3>
+            <h3 className="mt-1 font-serif text-[26px] font-semibold text-primary">Join the MOHAORI Circle</h3>
             <p className="mt-1 text-[15px] text-on-surface-variant">
               Receive invitations to private collection vernissages and 10% off your introductory commission.
             </p>
@@ -42,9 +42,9 @@ export default function MainFooter() {
 
         <div className="mb-16 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-5">
           <div>
-            <h4 className="mb-3 font-serif text-[22px] font-semibold text-primary">ATELIER &amp; CO.</h4>
+            <h4 className="mb-3 font-serif text-[22px] font-semibold text-primary">MOHAORI</h4>
             <p className="text-[13px] leading-relaxed text-on-surface-variant">
-              An atelier committed to quiet timelessness, natural materiality, and architectural discipline. Every item is conceived as a tactile artifact for contemplative living.
+              MOHAORI is my self-initiated full-stack e-commerce project, built with Next.js, Spring Boot, and PostgreSQL to create a complete online shopping experience.
             </p>
           </div>
           {FOOTER_COLUMNS.map((column) => (
@@ -79,7 +79,7 @@ export default function MainFooter() {
               </select>
             </div>
             <span className="opacity-40">|</span>
-            <span>© {new Date().getFullYear()} Atelier &amp; Co. All rights reserved.</span>
+            <span>© {new Date().getFullYear()} MOHAORI. All rights reserved.</span>
           </div>
           <div className="flex items-center gap-2">
             {["VISA", "MASTERCARD", "AMEX", "APPLE PAY"].map((card) => (

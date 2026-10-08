@@ -17,9 +17,9 @@ const geist = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Atelier & Co. — Fashion and Everyday Essentials",
+  title: "MOHAORI — Fashion and Everyday Essentials",
   description:
-    "Shop clothing, footwear, accessories, souvenirs, and everyday products from Atelier & Co.",
+    "Shop clothing, footwear, accessories, souvenirs, and everyday products from MOHAORI.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
