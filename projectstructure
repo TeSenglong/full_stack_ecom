@@ -1,0 +1,284 @@
+full_stack_ecom/ *.\mvnw.cmd spring-boot:run
+└── backend/
+    ├── pom.xml
+    ├── mvnw
+    ├── mvnw.cmd
+    └── src/
+        ├── main/
+        │   ├── java/com/example/backend/
+        │   │   ├── BackendApplication.java       <-- Main application entry point
+        │   │   │
+        │   │   ├── config/                        <-- Security & global configs
+        │   │   │   ├── WebMvcConfig.java          <-- CORS configuration for React
+        │   │   │   └── SecurityConfig.java        <-- JWT & Spring Security settings
+        │   │   │
+        │   │   ├── controller/                    <-- REST API routes (HTTP handling)
+        │   │   │   ├── AuthController.java        <-- Login & registration endpoints
+        │   │   │   ├── ProductController.java     <-- Fetching & searching products
+        │   │   │   ├── CartController.java        <-- Add/remove items from shopping cart
+        │   │   │   └── OrderController.java       <-- Checkout & order history
+        │   │   │
+        │   │   ├── dto/                           <-- Data Transfer Objects (Request/Response)
+        │   │   │   ├── LoginRequest.java
+        │   │   │   ├── RegisterRequest.java
+        │   │   │   ├── ProductResponse.java
+        │   │   │   └── OrderRequest.java
+        │   │   │
+        │   │   ├── exception/                     <-- Custom error handling
+        │   │   │   ├── GlobalExceptionHandler.java<-- Catches errors and returns clean JSON
+        │   │   │   ├── ResourceNotFoundException.java
+        │   │   │   └── BadRequestException.java
+        │   │   │
+        │   │   ├── model/                         <-- JPA Database Entities (Database Tables)
+        │   │   │   ├── User.java                  <-- "users" table
+        │   │   │   ├── Role.java                  <-- Enum/Table for USER, ADMIN roles
+        │   │   │   ├── Product.java               <-- "products" table
+        │   │   │   ├── Category.java              <-- "categories" table
+        │   │   │   ├── CartItem.java              <-- "cart_items" table
+        │   │   │   ├── Order.java                 <-- "orders" table
+        │   │   │   └── OrderItem.java             <-- "order_items" table
+        │   │   │
+        │   │   ├── repository/                    <-- Spring Data JPA interfaces
+        │   │   │   ├── UserRepository.java
+        │   │   │   ├── ProductRepository.java
+        │   │   │   ├── CategoryRepository.java
+        │   │   │   ├── CartItemRepository.java
+        │   │   │   └── OrderRepository.java
+        │   │   │
+        │   │   └── service/                       <-- Business logic & transaction handling
+        │   │       ├── AuthService.java
+        │   │       ├── ProductService.java
+        │   │       ├── CartService.java
+        │   │       └── OrderService.java
+        │   │
+        │   └── resources/
+        │       ├── application.yaml (or .properties) <-- DB connection credentials & settings
+        │       └── db/migration/                 <-- SQL migration scripts (Flyway/Liquibase)
+        │
+        └── test/                                 <-- Unit & integration tests
+
+
+Rate limiting
+Cache public product responses
+Use an exact production CORS origin
+Add WAF/bot protection
+Monitor traffic
+Consider a Next.js BFF
+
+
+frontend *npm run dev
+
+frontend/
+├── app/
+│   ├── (storefront)/                    # Public customer pages
+│   │   ├── layout.tsx
+│   │   ├── page.tsx                     # Home
+│   │   ├── about/
+│   │   │   └── page.tsx
+│   │   ├── products/
+│   │   │   ├── page.tsx                 # Product catalog
+│   │   │   └── [id]/
+│   │   │       ├── page.tsx             # Product details
+│   │   │       ├── loading.tsx
+│   │   │       └── error.tsx
+│   │   ├── categories/
+│   │   │   └── [id]/
+│   │   │       └── page.tsx
+│   │   ├── cart/
+│   │   │   └── page.tsx
+│   │   └── checkout/
+│   │       ├── page.tsx
+│   │       └── success/
+│   │           └── page.tsx
+│   │
+│   ├── (auth)/                          # Authentication pages
+│   │   ├── layout.tsx
+│   │   ├── login/
+│   │   │   └── page.tsx
+│   │   ├── register/
+│   │   │   └── page.tsx
+│   │   ├── forgot-password/
+│   │   │   └── page.tsx
+│   │   └── reset-password/
+│   │       └── page.tsx
+│   │
+│   ├── account/                         # Protected customer pages
+│   │   ├── layout.tsx
+│   │   ├── page.tsx                     # Account dashboard
+│   │   ├── profile/
+│   │   │   └── page.tsx
+│   │   ├── orders/
+│   │   │   ├── page.tsx
+│   │   │   └── [id]/
+│   │   │       └── page.tsx
+│   │   └── settings/
+│   │       └── page.tsx
+│   │
+│   ├── admin/                           # Protected admin area
+│   │   ├── layout.tsx
+│   │   ├── page.tsx                     # Admin dashboard
+│   │   ├── products/
+│   │   │   ├── page.tsx
+│   │   │   ├── create/
+│   │   │   │   └── page.tsx
+│   │   │   └── [id]/
+│   │   │       └── edit/
+│   │   │           └── page.tsx
+│   │   ├── categories/
+│   │   │   ├── page.tsx
+│   │   │   ├── create/
+│   │   │   │   └── page.tsx
+│   │   │   └── [id]/
+│   │   │       └── edit/
+│   │   │           └── page.tsx
+│   │   ├── orders/
+│   │   │   ├── page.tsx
+│   │   │   └── [id]/
+│   │   │       └── page.tsx
+│   │   └── users/
+│   │       ├── page.tsx
+│   │       └── [id]/
+│   │           └── page.tsx
+│   │
+│   ├── unauthorized/
+│   │   └── page.tsx
+│   ├── layout.tsx
+│   ├── globals.css
+│   ├── loading.tsx
+│   ├── error.tsx
+│   └── not-found.tsx
+│
+├── components/
+│   ├── layout/
+│   │   ├── MainHeader.tsx
+│   │   ├── MainFooter.tsx
+│   │   ├── UserMenu.tsx
+│   │   └── LogoutButton.tsx
+│   ├── auth/
+│   │   ├── LoginForm.tsx
+│   │   ├── RegisterForm.tsx
+│   │   ├── ForgotPasswordForm.tsx
+│   │   ├── AuthGuard.tsx
+│   │   └── AdminGuard.tsx
+│   ├── admin/
+│   │   ├── AdminSidebar.tsx
+│   │   ├── AdminHeader.tsx
+│   │   ├── DashboardStats.tsx
+│   │   ├── ProductForm.tsx
+│   │   ├── CategoryForm.tsx
+│   │   └── OrderStatusForm.tsx
+│   ├── products/
+│   ├── cart/
+│   ├── checkout/
+│   ├── orders/
+│   ├── account/
+│   ├── home/
+│   ├── about/
+│   └── ui/
+│
+├── providers/
+│   ├── AuthProvider.tsx
+│   ├── CartProvider.tsx
+│   └── ToastProvider.tsx
+│
+├── hooks/
+│   ├── useAuth.ts
+│   ├── useCart.ts
+│   ├── useProducts.ts
+│   └── useOrders.ts
+│
+├── lib/
+│   ├── api/
+│   │   ├── client.ts
+│   │   ├── auth.ts
+│   │   ├── account.ts
+│   │   ├── products.ts
+│   │   ├── categories.ts
+│   │   ├── cart.ts
+│   │   ├── orders.ts
+│   │   └── admin.ts
+│   ├── auth/
+│   │   ├── token-storage.ts
+│   │   ├── permissions.ts
+│   │   └── session.ts
+│   ├── validations/
+│   │   ├── auth.ts
+│   │   ├── product.ts
+│   │   └── checkout.ts
+│   ├── constants.ts
+│   └── utils.ts
+│
+├── types/
+│   ├── auth.ts
+│   ├── user.ts
+│   ├── product.ts
+│   ├── category.ts
+│   ├── cart.ts
+│   └── order.ts
+│
+├── middleware.ts                     # Protect account/admin routes
+├── public/
+├── package.json
+├── next.config.ts
+├── tsconfig.json
+└── .env.local
+promt : 
+### PROJECT CONTEXT & STATE SUMMARY
+
+1. Application Overview:
+- Project: Production-grade, full-stack e-commerce application.
+- Architecture: Layered N-Tier Architecture (Model -> Repository -> Service -> Controller).
+- Backend: Spring Boot running on Port 8081.
+- Frontend: Vue.js (Vue 3 with Vite/Axios, usually running on http://localhost:5173).
+- Database: H2 In-Memory Database (jdbc:h2:mem:ecomdb).
+
+2. Completed Modules & Implementation Rules:
+- Entity: Product
+  - Linked to Category via @ManyToOne (category field).
+  - Fields: id (Long), name (String), sku (String), description (String), price (double/Double), discountPrice (Double), stockQuantity (int), imageUrl (String), brand (String), releaseYear (int/Integer), active (boolean).
+  - Soft-delete pattern implemented using the `active` boolean flag.
+
+- Repository: ProductRepository
+  - Extends JpaRepository<Product, Long>.
+  - Query methods:
+    - findByActiveTrue()
+    - findBySku(String sku)
+    - findByCategoryIdAndActiveTrue(Long categoryId)
+    - findByNameContainingIgnoreCaseAndActiveTrue(String name)
+
+- Service: ProductService
+  - Configured with @Service and @SuppressWarnings("null").
+  - Primary logic methods:
+    - getAllActiveProducts() -> uses findByActiveTrue()
+    - getProductById(Long id)
+    - getProductBySku(String sku)
+    - getProductsByCategoryId(Long categoryId)
+    - searchProductsByName(String name)
+    - saveProduct(Product product)
+    - updateProduct(Long id, Product productDetails) -> fetches via findById(id) first, merges non-null updated fields (including category check), and saves.
+    - deactivateProduct(Long id) -> soft-deletes by setting active = false.
+    - deleteProduct(Long id) -> hard deletes via existsById/deleteById.
+
+- Controller: ProductController
+  - Base path: /api/products
+  - Configured with @RestController and @CrossOrigin(origins = "*").
+  - Endpoints:
+    - GET /api/products
+    - GET /api/products/{id}
+    - GET /api/products/sku/{sku}
+    - GET /api/products/category/{categoryId}
+    - GET /api/products/search?name=...
+    - POST /api/products
+    - PUT /api/products/{id}
+    - PATCH /api/products/{id}/deactivate
+    - DELETE /api/products/{id}
+
+- Initializer: DataInitializer
+  - Implements CommandLineRunner (@Component).
+  - Pre-loads sample Categories ("Electronics", "Clothing") and linked sample Products into H2 DB automatically on startup.
+
+3. Key Engineering Rules to Preserve:
+- DO NOT use streams on repository calls when custom JPA method signatures exist (use repository-level filtering like `findByActiveTrue()`).
+- Always implement explicit field updates in `updateProduct` inside Service rather than calling `saveProduct` directly from Controller.
+- Keep `@CrossOrigin(origins = "*")` on Controllers for Vue.js compatibility.
+- Ensure all new modules follow this exact standard: Model -> Repository -> Service -> Controller.
