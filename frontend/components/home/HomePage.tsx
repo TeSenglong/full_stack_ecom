@@ -317,10 +317,10 @@ export default function HomePage({ productsPromise }: HomePageProps) {
                 </p>
               </div>
               <Link
-                href="/products"
+                href="/categories"
                 className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:opacity-70"
               >
-                View the complete catalog
+                View all categories
                 <span className="material-symbols-outlined text-lg">east</span>
               </Link>
             </div>

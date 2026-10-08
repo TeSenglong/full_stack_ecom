@@ -3,7 +3,7 @@
 import Link from "next/link";
 
 const FOOTER_COLUMNS = [
-  { title: "Shop", links: [{ label: "New Releases", href: "/products?sort=newest" }, { label: "All Products", href: "/products" }, { label: "Furniture & Living", href: "/products" }, { label: "Tailored Apparel", href: "/products" }, { label: "Ceramics & Objects", href: "/products" }] },
+  { title: "Shop", links: [{ label: "New Releases", href: "/products?sort=newest" }, { label: "All Products", href: "/products" }, { label: "Browse Categories", href: "/categories" }, { label: "Furniture & Living", href: "/products" }, { label: "Tailored Apparel", href: "/products" }, { label: "Ceramics & Objects", href: "/products" }] },
   { title: "About", links: [{ label: "Our Philosophy", href: "/about" }, { label: "Our Story", href: "/about#story" }, { label: "Our Values", href: "/about#values" }, { label: "The Collection", href: "/products" }] },
   { title: "Client Services", links: [{ label: "Order Tracking", href: "#" }, { label: "Custom Commissions", href: "#" }, { label: "Care & Restoration", href: "#" }, { label: "Returns Policy", href: "#" }] },
   { title: "Sustainability", links: [{ label: "Material Provenance", href: "/about#values" }, { label: "Carbon Ledger", href: "#" }, { label: "Circular Repair", href: "/about#values" }, { label: "2024 Impact Dossier", href: "#" }] },

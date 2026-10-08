@@ -9,6 +9,7 @@ import type { Product } from "@/types/product";
 interface ProductsCatalogProps {
   products: Product[];
   initialSearch?: string;
+  initialCategory?: string;
   initialSort?: string;
   loadError?: boolean;
 }
@@ -22,11 +23,12 @@ function categoryName(product: Product) {
 export default function ProductsCatalog({
   products,
   initialSearch = "",
+  initialCategory = "all",
   initialSort = "featured",
   loadError = false,
 }: ProductsCatalogProps) {
   const [search, setSearch] = useState(initialSearch);
-  const [category, setCategory] = useState("all");
+  const [category, setCategory] = useState(initialCategory);
   const [sort, setSort] = useState(initialSort);
 
   const categories = useMemo(

@@ -12,6 +12,7 @@ export const metadata: Metadata = {
 interface ProductsPageProps {
   searchParams: Promise<{
     q?: string | string[];
+    category?: string | string[];
     sort?: string | string[];
   }>;
 }
@@ -37,6 +38,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
     <ProductsCatalog
       products={products}
       initialSearch={firstValue(query.q) ?? ""}
+      initialCategory={firstValue(query.category) ?? "all"}
       initialSort={firstValue(query.sort) ?? "featured"}
       loadError={loadError}
     />
