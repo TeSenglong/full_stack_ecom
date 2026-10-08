@@ -24,6 +24,9 @@ function firstValue(value?: string | string[]) {
 
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
   const query = await searchParams;
+  const initialSearch = firstValue(query.q) ?? "";
+  const initialCategory = firstValue(query.category) ?? "all";
+  const initialSort = firstValue(query.sort) ?? "featured";
   let products: Product[] = [];
   let categoryOptions: string[] = [];
   let loadError = false;
@@ -50,11 +53,12 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
   return (
     <ProductsCatalog
+      key={`${initialSearch}:${initialCategory}:${initialSort}`}
       products={products}
       categoryOptions={categoryOptions}
-      initialSearch={firstValue(query.q) ?? ""}
-      initialCategory={firstValue(query.category) ?? "all"}
-      initialSort={firstValue(query.sort) ?? "featured"}
+      initialSearch={initialSearch}
+      initialCategory={initialCategory}
+      initialSort={initialSort}
       loadError={loadError}
     />
   );
