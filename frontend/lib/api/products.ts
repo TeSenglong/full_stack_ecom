@@ -8,6 +8,7 @@ const API_TIMEOUT_MS = 5_000;
 const PRODUCT_LIST_TIMEOUT_MS = 30_000;
 const PRODUCT_LIST_MAX_ATTEMPTS = 3;
 const PRODUCT_LIST_RETRY_DELAY_MS = 2_000;
+const PRODUCT_LIST_PAGE_SIZE = 100;
 
 function wait(milliseconds: number) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
@@ -24,6 +25,50 @@ async function parseResponse<T>(response: Response, message: string): Promise<T>
   return response.json() as Promise<T>;
 }
 
+async function requestProductPage(
+  page: number,
+  size: number,
+  timeoutMs: number,
+): Promise<ProductPage> {
+  const params = new URLSearchParams({
+    page: String(page),
+    size: String(size),
+  });
+  const response = await fetch(`${getProductsUrl()}?${params}`, {
+    cache: "no-store",
+    signal: AbortSignal.timeout(timeoutMs),
+  });
+
+  return parseResponse<ProductPage>(response, "Failed to fetch products");
+}
+
+async function requestAllProducts(): Promise<Product[]> {
+  const firstPage = await requestProductPage(
+    0,
+    PRODUCT_LIST_PAGE_SIZE,
+    PRODUCT_LIST_TIMEOUT_MS,
+  );
+
+  if (firstPage.totalPages <= 1) {
+    return firstPage.content;
+  }
+
+  const remainingPages = await Promise.all(
+    Array.from({ length: firstPage.totalPages - 1 }, (_, index) =>
+      requestProductPage(
+        index + 1,
+        PRODUCT_LIST_PAGE_SIZE,
+        PRODUCT_LIST_TIMEOUT_MS,
+      ),
+    ),
+  );
+
+  return [
+    ...firstPage.content,
+    ...remainingPages.flatMap((page) => page.content),
+  ];
+}
+
 export async function getProducts(): Promise<Product[]> {
   let lastError: unknown;
 
@@ -33,17 +78,7 @@ export async function getProducts(): Promise<Product[]> {
     attempt++
   ) {
     try {
-      const response = await fetch(getProductsUrl(), {
-        cache: "no-store",
-        signal: AbortSignal.timeout(PRODUCT_LIST_TIMEOUT_MS),
-      });
-
-      const page = await parseResponse<ProductPage>(
-        response,
-        "Failed to fetch products",
-      );
-
-      return page.content;
+      return await requestAllProducts();
     } catch (error) {
       lastError = error;
 
@@ -62,16 +97,7 @@ export async function getProductPage(
   page = 0,
   size = 20,
 ): Promise<ProductPage> {
-  const params = new URLSearchParams({
-    page: String(page),
-    size: String(size),
-  });
-  const response = await fetch(`${getProductsUrl()}?${params}`, {
-    cache: "no-store",
-    signal: AbortSignal.timeout(API_TIMEOUT_MS),
-  });
-
-  return parseResponse<ProductPage>(response, "Failed to fetch products");
+  return requestProductPage(page, size, API_TIMEOUT_MS);
 }
 
 export async function getProductById(id: string): Promise<Product> {

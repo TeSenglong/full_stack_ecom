@@ -8,6 +8,7 @@ import type { Product } from "@/types/product";
 
 interface ProductsCatalogProps {
   products: Product[];
+  categoryOptions?: string[];
   initialSearch?: string;
   initialCategory?: string;
   initialSort?: string;
@@ -22,6 +23,7 @@ function categoryName(product: Product) {
 
 export default function ProductsCatalog({
   products,
+  categoryOptions = [],
   initialSearch = "",
   initialCategory = "all",
   initialSort = "featured",
@@ -32,8 +34,11 @@ export default function ProductsCatalog({
   const [sort, setSort] = useState(initialSort);
 
   const categories = useMemo(
-    () => Array.from(new Set(products.map(categoryName))).sort(),
-    [products],
+    () =>
+      Array.from(
+        new Set([...categoryOptions, ...products.map(categoryName)]),
+      ).sort((left, right) => left.localeCompare(right)),
+    [categoryOptions, products],
   );
 
   const visibleProducts = useMemo(() => {

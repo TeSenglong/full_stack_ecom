@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { unstable_rethrow } from "next/navigation";
 import ProductsCatalog from "@/components/products/ProductsCatalog";
+import { getCategories } from "@/lib/api/categories";
 import { getProducts } from "@/lib/api/products";
 import type { Product } from "@/types/product";
 
@@ -24,19 +25,33 @@ function firstValue(value?: string | string[]) {
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
   const query = await searchParams;
   let products: Product[] = [];
+  let categoryOptions: string[] = [];
   let loadError = false;
 
-  try {
-    products = await getProducts();
-  } catch (error) {
-    unstable_rethrow(error);
-    console.error("Unable to load the product catalog:", error);
-    loadError = true;
-  }
+  await Promise.all([
+    getProducts()
+      .then((data) => {
+        products = data;
+      })
+      .catch((error) => {
+        unstable_rethrow(error);
+        console.error("Unable to load the product catalog:", error);
+        loadError = true;
+      }),
+    getCategories()
+      .then((data) => {
+        categoryOptions = data.map((category) => category.name);
+      })
+      .catch((error) => {
+        unstable_rethrow(error);
+        console.error("Unable to load product filter categories:", error);
+      }),
+  ]);
 
   return (
     <ProductsCatalog
       products={products}
+      categoryOptions={categoryOptions}
       initialSearch={firstValue(query.q) ?? ""}
       initialCategory={firstValue(query.category) ?? "all"}
       initialSort={firstValue(query.sort) ?? "featured"}
