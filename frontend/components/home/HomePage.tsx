@@ -1,6 +1,9 @@
+import Image from "next/image";
 import Link from "next/link";
+import { Suspense } from "react";
 
 import ProductShowcase from "@/components/home/ProductShowcase";
+import ProductSkeleton from "@/components/products/ProductSkeleton";
 import ProgressiveImage from "@/components/products/ProgressiveImage";
 import type { ShowcaseProduct } from "@/types/product";
 
@@ -33,12 +36,20 @@ const SHOPPING_STEPS = [
 
 const FALLBACK_IMAGE =
   "https://lzfudmcajnsccibezqgb.supabase.co/storage/v1/object/public/image/Garments_arranged_on_dark_surface_20261008005847.jpg";
+const HOME_HERO_IMAGE = "/home.jpg";
 
-export default function HomePage({ products }: { products: ShowcaseProduct[] }) {
-  const categoryMap = new Map<
-    string,
-    { name: string; count: number; imageUrl: string }
-  >();
+interface HomePageProps {
+  productsPromise: Promise<ShowcaseProduct[]>;
+}
+
+interface CategorySummary {
+  name: string;
+  count: number;
+  imageUrl: string;
+}
+
+function summarizeCategories(products: ShowcaseProduct[]) {
+  const categoryMap = new Map<string, CategorySummary>();
 
   for (const product of products) {
     const categoryName = product.category?.trim() || "Other products";
@@ -58,15 +69,172 @@ export default function HomePage({ products }: { products: ShowcaseProduct[] }) 
     }
   }
 
-  const categories = Array.from(categoryMap.values()).slice(0, 4);
+  return categoryMap;
+}
+
+async function HomeStats({
+  productsPromise,
+}: {
+  productsPromise: Promise<ShowcaseProduct[]>;
+}) {
+  const products = await productsPromise;
+  const categoryCount = summarizeCategories(products).size;
   const inStockCount = products.filter(
     (product) => (product.stockQuantity ?? 0) > 0,
   ).length;
+
+  return (
+    <>
+      <div>
+        <dt className="text-xs text-on-surface-variant">Products</dt>
+        <dd className="mt-1 font-serif text-2xl font-semibold text-primary">
+          {products.length}
+        </dd>
+      </div>
+      <div>
+        <dt className="text-xs text-on-surface-variant">Categories</dt>
+        <dd className="mt-1 font-serif text-2xl font-semibold text-primary">
+          {categoryCount}
+        </dd>
+      </div>
+      <div>
+        <dt className="text-xs text-on-surface-variant">In stock</dt>
+        <dd className="mt-1 font-serif text-2xl font-semibold text-secondary">
+          {inStockCount}
+        </dd>
+      </div>
+    </>
+  );
+}
+
+function HomeStatsLoading() {
+  return (
+    <>
+      {["Products", "Categories", "In stock"].map((label) => (
+        <div key={label}>
+          <dt className="text-xs text-on-surface-variant">{label}</dt>
+          <dd className="mt-2 h-6 w-10 animate-pulse rounded bg-outline-variant/40" />
+        </div>
+      ))}
+    </>
+  );
+}
+
+async function HomeCategories({
+  productsPromise,
+}: {
+  productsPromise: Promise<ShowcaseProduct[]>;
+}) {
+  const products = await productsPromise;
+  const categories = Array.from(summarizeCategories(products).values()).slice(
+    0,
+    4,
+  );
+
+  if (categories.length === 0) {
+    return (
+      <div className="rounded-xl border border-dashed border-primary/20 bg-surface-lowest px-6 py-14 text-center">
+        <h3 className="font-serif text-2xl font-semibold text-primary">
+          Categories are coming soon
+        </h3>
+        <p className="mt-2 text-on-surface-variant">
+          New categories will appear here when products are added to the catalog.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      {categories.map((category) => (
+        <Link
+          key={category.name}
+          href={`/products?q=${encodeURIComponent(category.name)}`}
+          className="group overflow-hidden rounded-xl border border-primary/10 bg-surface-lowest shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
+        >
+          <ProgressiveImage
+            src={category.imageUrl || FALLBACK_IMAGE}
+            alt={`${category.name} collection`}
+            className="aspect-4/3 w-full transition-transform duration-500 group-hover:scale-105"
+          />
+          <div className="p-5">
+            <p className="text-xs font-semibold uppercase tracking-widest text-secondary">
+              {category.count} {category.count === 1 ? "product" : "products"}
+            </p>
+            <h3 className="mt-1 font-serif text-2xl font-semibold text-primary">
+              {category.name}
+            </h3>
+            <p className="mt-2 text-sm text-on-surface-variant">
+              View all products in this category.
+            </p>
+          </div>
+        </Link>
+      ))}
+    </div>
+  );
+}
+
+function HomeCategoriesLoading() {
+  return (
+    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      {[1, 2, 3, 4].map((item) => (
+        <div
+          key={item}
+          className="animate-pulse overflow-hidden rounded-xl border border-primary/10 bg-surface-lowest"
+        >
+          <div className="aspect-4/3 bg-outline-variant/30" />
+          <div className="space-y-3 p-5">
+            <div className="h-3 w-20 rounded bg-outline-variant/30" />
+            <div className="h-7 w-28 rounded bg-outline-variant/40" />
+            <div className="h-4 w-40 rounded bg-outline-variant/30" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+async function HomeProductShowcase({
+  productsPromise,
+}: {
+  productsPromise: Promise<ShowcaseProduct[]>;
+}) {
+  const products = await productsPromise;
+
+  return <ProductShowcase products={products} />;
+}
+
+function HomeProductShowcaseLoading() {
+  return (
+    <section className="mx-auto max-w-350 px-5 py-24 md:px-8 lg:px-12">
+      <div className="mb-10 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+        <div>
+          <span className="text-[13px] uppercase tracking-[0.08em] text-secondary">
+            Shop the catalog
+          </span>
+          <h2 className="mt-1 font-serif text-[32px] font-semibold text-primary">
+            Featured products
+          </h2>
+          <p className="mt-2 text-sm text-on-surface-variant">
+            The store is waking up. Products will appear shortly.
+          </p>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {[1, 2, 3, 4].map((item) => (
+          <ProductSkeleton key={item} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+export default function HomePage({ productsPromise }: HomePageProps) {
   return (
     <div className="w-full bg-surface font-sans text-on-surface antialiased">
       <main className="w-full">
 
-        <section className="mx-auto max-w-350 px-5 py-14 md:px-8 md:py-20 lg:px-12 lg:py-24">
+        <section className="mx-auto max-w-350 px-5 pb-14 pt-6 md:px-8 md:pb-20 md:pt-8 lg:px-12 lg:pb-24 lg:pt-10">
           <div className="grid items-center gap-12 lg:grid-cols-12">
             <div className="lg:col-span-6">
               <div className="mb-4 flex items-center gap-2">
@@ -101,24 +269,9 @@ export default function HomePage({ products }: { products: ShowcaseProduct[] }) 
               </div>
 
               <dl className="mt-10 grid grid-cols-3 gap-3 rounded-lg border border-outline/10 bg-surface-low p-4">
-                <div>
-                  <dt className="text-xs text-on-surface-variant">Products</dt>
-                  <dd className="mt-1 font-serif text-2xl font-semibold text-primary">
-                    {products.length}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-xs text-on-surface-variant">Categories</dt>
-                  <dd className="mt-1 font-serif text-2xl font-semibold text-primary">
-                    {categoryMap.size}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-xs text-on-surface-variant">In stock</dt>
-                  <dd className="mt-1 font-serif text-2xl font-semibold text-secondary">
-                    {inStockCount}
-                  </dd>
-                </div>
+                <Suspense fallback={<HomeStatsLoading />}>
+                  <HomeStats productsPromise={productsPromise} />
+                </Suspense>
               </dl>
             </div>
 
@@ -127,10 +280,13 @@ export default function HomePage({ products }: { products: ShowcaseProduct[] }) 
                 href={"/products"}
                 className="group relative block aspect-4/5 overflow-hidden rounded-2xl bg-surface-low shadow-xl"
               >
-                <ProgressiveImage
-                  src={FALLBACK_IMAGE}
+                <Image
+                  src={HOME_HERO_IMAGE}
                   alt="ATELIER & CO. fashion collection"
-                  className="h-full w-full transition-transform duration-700 group-hover:scale-105"
+                  fill
+                  preload
+                  sizes="(min-width: 1400px) 650px, (min-width: 1024px) 50vw, 100vw"
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-black/75 via-black/5 to-transparent" />
                 <div className="absolute inset-x-0 bottom-0 p-7 text-white md:p-9">
@@ -170,47 +326,15 @@ export default function HomePage({ products }: { products: ShowcaseProduct[] }) 
               </Link>
             </div>
 
-            {categories.length > 0 ? (
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                {categories.map((category) => (
-                  <Link
-                    key={category.name}
-                    href={`/products?q=${encodeURIComponent(category.name)}`}
-                    className="group overflow-hidden rounded-xl border border-primary/10 bg-surface-lowest shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
-                  >
-                    <ProgressiveImage
-                      src={category.imageUrl || FALLBACK_IMAGE}
-                      alt={`${category.name} collection`}
-                      className="aspect-4/3 w-full transition-transform duration-500 group-hover:scale-105"
-                    />
-                    <div className="p-5">
-                      <p className="text-xs font-semibold uppercase tracking-widest text-secondary">
-                        {category.count} {category.count === 1 ? "product" : "products"}
-                      </p>
-                      <h3 className="mt-1 font-serif text-2xl font-semibold text-primary">
-                        {category.name}
-                      </h3>
-                      <p className="mt-2 text-sm text-on-surface-variant">
-                        View all products in this category.
-                      </p>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            ) : (
-              <div className="rounded-xl border border-dashed border-primary/20 bg-surface-lowest px-6 py-14 text-center">
-                <h3 className="font-serif text-2xl font-semibold text-primary">
-                  Categories are coming soon
-                </h3>
-                <p className="mt-2 text-on-surface-variant">
-                  New categories will appear here when products are added to the catalog.
-                </p>
-              </div>
-            )}
+            <Suspense fallback={<HomeCategoriesLoading />}>
+              <HomeCategories productsPromise={productsPromise} />
+            </Suspense>
           </div>
         </section>
 
-        <ProductShowcase products={products} />
+        <Suspense fallback={<HomeProductShowcaseLoading />}>
+          <HomeProductShowcase productsPromise={productsPromise} />
+        </Suspense>
 
         <section className="bg-brand-panel py-20 text-on-brand">
           <div className="mx-auto max-w-350 px-5 md:px-8 lg:px-12">
