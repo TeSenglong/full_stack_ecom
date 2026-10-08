@@ -36,6 +36,17 @@ app:
       issuer: ${JWT_ISSUER:ecom-backend}
       audience: ${JWT_AUDIENCE:ecom-api}
       access-token-ttl: ${JWT_ACCESS_TOKEN_TTL:PT15M}
+    rate-limit:
+      enabled: ${AUTH_RATE_LIMIT_ENABLED:true}
+      cache-max-entries: ${AUTH_RATE_LIMIT_CACHE_MAX_ENTRIES:10000}
+      login:
+        per-identity-capacity: ${AUTH_LOGIN_RATE_LIMIT_PER_IDENTITY:5}
+        global-capacity: ${AUTH_LOGIN_RATE_LIMIT_GLOBAL:100}
+        period: ${AUTH_LOGIN_RATE_LIMIT_PERIOD:PT1M}
+      registration:
+        per-identity-capacity: ${AUTH_REGISTRATION_RATE_LIMIT_PER_IDENTITY:3}
+        global-capacity: ${AUTH_REGISTRATION_RATE_LIMIT_GLOBAL:30}
+        period: ${AUTH_REGISTRATION_RATE_LIMIT_PERIOD:PT1H}
 
   storage:
     avatar:

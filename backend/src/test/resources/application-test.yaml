@@ -20,3 +20,5 @@ app:
       issuer: ecom-backend-test
       audience: ecom-api
       access-token-ttl: PT15M
+    rate-limit:
+      enabled: false

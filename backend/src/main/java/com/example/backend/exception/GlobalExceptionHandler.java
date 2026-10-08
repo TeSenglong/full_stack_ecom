@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -40,6 +41,28 @@ public class GlobalExceptionHandler {
 			HttpServletRequest request
 	) {
 		return buildError(HttpStatus.UNAUTHORIZED, "Invalid credentials", request, null);
+	}
+
+	@ExceptionHandler(RateLimitExceededException.class)
+	public ResponseEntity<ApiError> handleRateLimit(
+			RateLimitExceededException exception,
+			HttpServletRequest request
+	) {
+		ApiError error = new ApiError(
+				Instant.now(),
+				HttpStatus.TOO_MANY_REQUESTS.value(),
+				HttpStatus.TOO_MANY_REQUESTS.getReasonPhrase(),
+				exception.getMessage(),
+				request.getRequestURI(),
+				null
+		);
+
+		return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+				.header(
+						HttpHeaders.RETRY_AFTER,
+						Long.toString(exception.getRetryAfterSeconds())
+				)
+				.body(error);
 	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)

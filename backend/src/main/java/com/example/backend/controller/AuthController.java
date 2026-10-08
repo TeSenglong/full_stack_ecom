@@ -4,6 +4,7 @@ import com.example.backend.dto.auth.AuthResponse;
 import com.example.backend.dto.auth.LoginRequest;
 import com.example.backend.dto.auth.RegisterRequest;
 import com.example.backend.dto.auth.UserResponse;
+import com.example.backend.service.AuthRateLimiter;
 import com.example.backend.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -18,9 +19,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
+    private final AuthRateLimiter authRateLimiter;
 
-    public AuthController(AuthService authService) {
+    public AuthController(
+            AuthService authService,
+            AuthRateLimiter authRateLimiter
+    ) {
         this.authService = authService;
+        this.authRateLimiter = authRateLimiter;
     }
 
     @PostMapping("/register")
@@ -28,6 +34,7 @@ public class AuthController {
     public UserResponse register(
             @Valid @RequestBody RegisterRequest request
     ) {
+        authRateLimiter.checkRegistration(request.email());
         return authService.register(request);
     }
 
@@ -35,6 +42,7 @@ public class AuthController {
     public AuthResponse login(
             @Valid @RequestBody LoginRequest request
     ) {
+        authRateLimiter.checkLogin(request.email());
         return authService.login(request);
     }
 }
