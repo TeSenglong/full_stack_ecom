@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
+import { rejectInvalidCsrfOrigin } from "@/lib/security/csrf";
 
 const BACKEND_URL = process.env.BACKEND_URL;
 
 export async function POST(request: Request) {
+  const csrfFailure = rejectInvalidCsrfOrigin(request);
+  if (csrfFailure) return csrfFailure;
+
   if (!BACKEND_URL) {
     return NextResponse.json(
       { message: "BACKEND_URL is not configured" },

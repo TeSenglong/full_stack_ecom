@@ -1,5 +1,4 @@
-/* eslint-disable @next/next/no-img-element */
-
+import Image from "next/image";
 
 export default function OurStory() {
   return (
@@ -15,7 +14,14 @@ export default function OurStory() {
           </div>
           <div className="lg:col-span-7">
             <div className="relative aspect-4/3 overflow-hidden rounded-lg bg-surface-container shadow-lg">
-              <img src="https://lzfudmcajnsccibezqgb.supabase.co/storage/v1/object/public/image/Minimal%20Full-Stack%20Architecture%20Diagram.png" alt="Ceramicist forming a vessel in the workshop" className="h-full w-full object-cover" />
+              <Image
+                src="https://lzfudmcajnsccibezqgb.supabase.co/storage/v1/object/public/image/Minimal%20Full-Stack%20Architecture%20Diagram.png"
+                alt="Full-stack ecommerce architecture diagram"
+                fill
+                sizes="(min-width: 1024px) 58vw, 100vw"
+                loading="lazy"
+                className="object-cover"
+              />
             </div>
           </div>
         </div>

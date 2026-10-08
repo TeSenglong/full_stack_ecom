@@ -1,4 +1,4 @@
-/* eslint-disable @next/next/no-img-element */
+import Image from "next/image";
 import Link from "next/link";
 
 export default function AboutHero() {
@@ -18,7 +18,14 @@ export default function AboutHero() {
           </div>
         </div>
         <div className="relative min-h-120 bg-primary-container lg:min-h-full">
-          <img src="https://lzfudmcajnsccibezqgb.supabase.co/storage/v1/object/public/image/profile-cover.jpg" alt="An artisan working carefully by hand" className="absolute inset-0 h-full w-full object-cover" />
+          <Image
+            src="https://lzfudmcajnsccibezqgb.supabase.co/storage/v1/object/public/image/profile-cover.jpg"
+            alt="An artisan working carefully by hand"
+            fill
+            sizes="(min-width: 1024px) 50vw, 100vw"
+            loading="eager"
+            className="object-cover"
+          />
           <div className="absolute inset-0 bg-linear-to-t from-primary/50 via-transparent to-transparent" />
           <div className="absolute bottom-7 left-7 right-7 rounded bg-surface-lowest/90 p-5 text-primary shadow-xl backdrop-blur-sm md:left-auto md:max-w-sm">
             <p className="font-serif text-xl font-semibold">“Full-stack E-Commerce”</p>

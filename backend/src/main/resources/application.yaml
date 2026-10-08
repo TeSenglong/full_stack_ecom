@@ -47,6 +47,12 @@ app:
         per-identity-capacity: ${AUTH_REGISTRATION_RATE_LIMIT_PER_IDENTITY:3}
         global-capacity: ${AUTH_REGISTRATION_RATE_LIMIT_GLOBAL:30}
         period: ${AUTH_REGISTRATION_RATE_LIMIT_PERIOD:PT1H}
+    checkout-rate-limit:
+      enabled: ${CHECKOUT_RATE_LIMIT_ENABLED:true}
+      cache-max-entries: ${CHECKOUT_RATE_LIMIT_CACHE_MAX_ENTRIES:10000}
+      per-user-capacity: ${CHECKOUT_RATE_LIMIT_PER_USER:3}
+      global-capacity: ${CHECKOUT_RATE_LIMIT_GLOBAL:100}
+      period: ${CHECKOUT_RATE_LIMIT_PERIOD:PT15M}
 
   storage:
     avatar:

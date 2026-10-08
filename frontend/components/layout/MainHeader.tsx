@@ -11,7 +11,7 @@ import { useAuth } from "@/hooks/useAuth";
 const NAV_LINKS = [
   { label: "Home", href: "/" },
   { label: "Products", href: "/products" },
-  { label: "Categories", href: "/categories" },
+  { label: "Categories", href: "/#categories" },
   { label: "About", href: "/about" },
 ];
 
@@ -94,6 +94,7 @@ export default function MainHeader() {
             <Link
               key={link.href}
               href={link.href}
+              prefetch={link.href.startsWith("/about") ? false : undefined}
               className="text-[13px] font-medium uppercase tracking-[0.08em] text-on-surface-variant transition-opacity hover:opacity-70"
             >
               {link.label}

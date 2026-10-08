@@ -22,3 +22,5 @@ app:
       access-token-ttl: PT15M
     rate-limit:
       enabled: false
+    checkout-rate-limit:
+      enabled: false

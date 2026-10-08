@@ -91,7 +91,7 @@ public class Order {
         this.recipientPhone = recipientPhone;
         this.shippingAddress = shippingAddress;
         this.paymentMethod = paymentMethod;
-        this.status = OrderStatus.CONFIRMED;
+        this.status = OrderStatus.PENDING;
     }
 
     @PrePersist

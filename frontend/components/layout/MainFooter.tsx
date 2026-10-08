@@ -53,7 +53,13 @@ export default function MainFooter() {
               <ul className="space-y-2 text-[13px] text-on-surface-variant">
                 {column.links.map((link) => (
                   <li key={link.label}>
-                    <Link href={link.href} className="transition-opacity hover:opacity-70">{link.label}</Link>
+                    <Link
+                      href={link.href}
+                      prefetch={link.href.startsWith("/about") ? false : undefined}
+                      className="transition-opacity hover:opacity-70"
+                    >
+                      {link.label}
+                    </Link>
                   </li>
                 ))}
               </ul>

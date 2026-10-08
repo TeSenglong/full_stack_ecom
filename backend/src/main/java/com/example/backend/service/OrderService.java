@@ -1,5 +1,6 @@
 package com.example.backend.service;
 
+import com.example.backend.config.ShoppingLimits;
 import com.example.backend.dto.order.CheckoutRequest;
 import com.example.backend.dto.order.OrderResponse;
 import com.example.backend.dto.PageResponse;
@@ -31,21 +32,26 @@ public class OrderService {
     private final CartItemRepository cartItemRepository;
     private final ProductRepository productRepository;
     private final AppUserRepository userRepository;
+    private final CheckoutRateLimiter checkoutRateLimiter;
 
     public OrderService(
             OrderRepository orderRepository,
             CartItemRepository cartItemRepository,
             ProductRepository productRepository,
-            AppUserRepository userRepository
+            AppUserRepository userRepository,
+            CheckoutRateLimiter checkoutRateLimiter
     ) {
         this.orderRepository = orderRepository;
         this.cartItemRepository = cartItemRepository;
         this.productRepository = productRepository;
         this.userRepository = userRepository;
+        this.checkoutRateLimiter = checkoutRateLimiter;
     }
 
     @Transactional
     public OrderResponse checkout(Long userId, CheckoutRequest request) {
+        checkoutRateLimiter.check(userId);
+
         AppUser user = userRepository.findLockedById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
 
@@ -54,6 +60,8 @@ public class OrderService {
         if (cartItems.isEmpty()) {
             throw new BadRequestException("Cannot checkout with an empty cart");
         }
+
+        validateCartLimits(cartItems);
 
         String orderNumber = generateUniqueOrderNumber();
 
@@ -71,22 +79,18 @@ public class OrderService {
 
         for (CartItem item : cartItems) {
             Product product = item.getProduct();
+
+            if (item.getQuantity() > product.getStockQuantity()) {
+                throw new BadRequestException(
+                        "Insufficient stock for product '" + product.getName() + "'"
+                );
+            }
+
             BigDecimal unitPrice = product.getDiscountPrice() != null
                     ? product.getDiscountPrice()
                     : product.getPrice();
             BigDecimal subtotal = unitPrice.multiply(BigDecimal.valueOf(item.getQuantity()));
             totalAmount = totalAmount.add(subtotal);
-
-            int updatedRows = productRepository.deductStock(
-                    product.getId(),
-                    item.getQuantity()
-            );
-
-            if (updatedRows != 1) {
-                throw new BadRequestException(
-                        "Insufficient stock for product '" + product.getName() + "'"
-                );
-            }
 
             OrderItem orderItem = new OrderItem(
                     order,
@@ -197,7 +201,12 @@ public class OrderService {
 
         validateStatusTransition(order.getStatus(), status);
 
-        if (status == OrderStatus.CANCELLED) {
+        OrderStatus currentStatus = order.getStatus();
+
+        if (status == OrderStatus.CONFIRMED) {
+            deductOrderStock(order);
+        } else if (status == OrderStatus.CANCELLED
+                && currentStatus == OrderStatus.CONFIRMED) {
             restoreOrderStock(order);
         }
 
@@ -232,6 +241,51 @@ public class OrderService {
                         "Could not restore stock for product " + item.getProduct().getId()
                 );
             }
+        }
+    }
+
+    private void deductOrderStock(Order order) {
+        for (OrderItem item : order.getItems()) {
+            int updatedRows = productRepository.deductStock(
+                    item.getProduct().getId(),
+                    item.getQuantity()
+            );
+
+            if (updatedRows != 1) {
+                throw new BadRequestException(
+                        "Insufficient stock for product '" + item.getProduct().getName() + "'"
+                );
+            }
+        }
+    }
+
+    private void validateCartLimits(List<CartItem> cartItems) {
+        if (cartItems.size() > ShoppingLimits.MAX_DISTINCT_CART_ITEMS) {
+            throw new BadRequestException(
+                    "Order cannot contain more than "
+                            + ShoppingLimits.MAX_DISTINCT_CART_ITEMS
+                            + " different products"
+            );
+        }
+
+        int totalQuantity = 0;
+        for (CartItem item : cartItems) {
+            if (item.getQuantity() > ShoppingLimits.MAX_QUANTITY_PER_PRODUCT) {
+                throw new BadRequestException(
+                        "Quantity must not exceed "
+                                + ShoppingLimits.MAX_QUANTITY_PER_PRODUCT
+                                + " per product"
+                );
+            }
+            totalQuantity += item.getQuantity();
+        }
+
+        if (totalQuantity > ShoppingLimits.MAX_TOTAL_ITEMS_PER_ORDER) {
+            throw new BadRequestException(
+                    "Order cannot contain more than "
+                            + ShoppingLimits.MAX_TOTAL_ITEMS_PER_ORDER
+                            + " total items"
+            );
         }
     }
 

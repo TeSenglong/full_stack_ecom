@@ -4,13 +4,6 @@ import ProductShowcase from "@/components/home/ProductShowcase";
 import ProgressiveImage from "@/components/products/ProgressiveImage";
 import type { ShowcaseProduct } from "@/types/product";
 
-const STORE_FEATURES = [
-  { icon: "inventory_2", label: "Live product availability" },
-  { icon: "lock", label: "Secure customer accounts" },
-  { icon: "shopping_bag", label: "Simple cart and checkout" },
-  { icon: "local_shipping", label: "Order history and tracking" },
-];
-
 const SHOPPING_STEPS = [
   {
     icon: "search",
@@ -41,13 +34,6 @@ const SHOPPING_STEPS = [
 const FALLBACK_IMAGE =
   "https://lzfudmcajnsccibezqgb.supabase.co/storage/v1/object/public/image/Garments_arranged_on_dark_surface_20261008005847.jpg";
 
-function formatPrice(value: number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(value);
-}
-
 export default function HomePage({ products }: { products: ShowcaseProduct[] }) {
   const categoryMap = new Map<
     string,
@@ -76,9 +62,6 @@ export default function HomePage({ products }: { products: ShowcaseProduct[] }) 
   const inStockCount = products.filter(
     (product) => (product.stockQuantity ?? 0) > 0,
   ).length;
-  const featuredProduct =
-    products.find((product) => (product.stockQuantity ?? 0) > 0) ?? products[0];
-
   return (
     <div className="w-full bg-surface font-sans text-on-surface antialiased">
       <main className="w-full">

@@ -75,7 +75,7 @@ class OrderServiceIntegrationTests {
     }
 
     @Test
-    void checkoutAtomicallyDeductsStockAndClearsCart() {
+    void checkoutCreatesPendingOrderWithoutDeductingStockAndClearsCart() {
         AppUser user = createUser("buyer@example.com");
         Product product = createProduct(5);
         cartItemRepository.save(new CartItem(user, product, 2));
@@ -83,10 +83,9 @@ class OrderServiceIntegrationTests {
         OrderResponse response = orderService.checkout(user.getId(), checkoutRequest());
 
         assertThat(response.totalAmount()).isEqualByComparingTo("39.98");
+        assertThat(response.status()).isEqualTo(OrderStatus.PENDING);
         assertThat(productRepository.findById(product.getId()).orElseThrow().getStockQuantity())
-                .isEqualTo(3);
-        assertThat(productRepository.findById(product.getId()).orElseThrow().getVersion())
-                .isEqualTo(1);
+                .isEqualTo(5);
         assertThat(orderRepository.count()).isEqualTo(1);
         assertThat(cartItemRepository.countByUserId(user.getId())).isZero();
     }
@@ -132,7 +131,7 @@ class OrderServiceIntegrationTests {
                     .isEqualTo(1);
             assertThat(orderRepository.count()).isEqualTo(1);
             assertThat(productRepository.findById(product.getId()).orElseThrow().getStockQuantity())
-                    .isEqualTo(3);
+                    .isEqualTo(5);
             assertThat(cartItemRepository.countByUserId(user.getId())).isZero();
         } finally {
             executor.shutdownNow();
@@ -146,18 +145,22 @@ class OrderServiceIntegrationTests {
         cartItemRepository.save(new CartItem(user, product, 1));
         OrderResponse created = orderService.checkout(user.getId(), checkoutRequest());
 
+        OrderResponse confirmed = orderService.updateOrderStatus(created.id(), OrderStatus.CONFIRMED);
         OrderResponse shipped = orderService.updateOrderStatus(created.id(), OrderStatus.SHIPPED);
         OrderResponse delivered = orderService.updateOrderStatus(created.id(), OrderStatus.DELIVERED);
 
+        assertThat(confirmed.status()).isEqualTo(OrderStatus.CONFIRMED);
         assertThat(shipped.status()).isEqualTo(OrderStatus.SHIPPED);
         assertThat(delivered.status()).isEqualTo(OrderStatus.DELIVERED);
+        assertThat(productRepository.findById(product.getId()).orElseThrow().getStockQuantity())
+                .isEqualTo(4);
         assertThatThrownBy(() -> orderService.updateOrderStatus(created.id(), OrderStatus.PENDING))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("Cannot change order status");
     }
 
     @Test
-    void cancellingOrderRestoresStockOnlyOnce() {
+    void cancellingPendingOrderDoesNotChangeStock() {
         AppUser user = createUser("cancellation-buyer@example.com");
         Product product = createProduct(5);
         cartItemRepository.save(new CartItem(user, product, 2));
@@ -170,6 +173,62 @@ class OrderServiceIntegrationTests {
         assertThat(repeatedCancellation.status()).isEqualTo(OrderStatus.CANCELLED);
         assertThat(productRepository.findById(product.getId()).orElseThrow().getStockQuantity())
                 .isEqualTo(5);
+    }
+
+    @Test
+    void cancellingConfirmedOrderRestoresStockOnlyOnce() {
+        AppUser user = createUser("confirmed-cancellation-buyer@example.com");
+        Product product = createProduct(5);
+        cartItemRepository.save(new CartItem(user, product, 2));
+        OrderResponse created = orderService.checkout(user.getId(), checkoutRequest());
+        orderService.updateOrderStatus(created.id(), OrderStatus.CONFIRMED);
+
+        OrderResponse cancelled = orderService.updateOrderStatus(created.id(), OrderStatus.CANCELLED);
+        OrderResponse repeatedCancellation = orderService.updateOrderStatus(created.id(), OrderStatus.CANCELLED);
+
+        assertThat(cancelled.status()).isEqualTo(OrderStatus.CANCELLED);
+        assertThat(repeatedCancellation.status()).isEqualTo(OrderStatus.CANCELLED);
+        assertThat(productRepository.findById(product.getId()).orElseThrow().getStockQuantity())
+                .isEqualTo(5);
+    }
+
+    @Test
+    void confirmationRechecksStockAndLeavesOrderPendingWhenUnavailable() {
+        Product product = createProduct(5);
+        AppUser firstUser = createUser("first-confirmation-buyer@example.com");
+        AppUser secondUser = createUser("second-confirmation-buyer@example.com");
+        cartItemRepository.save(new CartItem(firstUser, product, 4));
+        cartItemRepository.save(new CartItem(secondUser, product, 4));
+
+        OrderResponse firstOrder = orderService.checkout(firstUser.getId(), checkoutRequest());
+        OrderResponse secondOrder = orderService.checkout(secondUser.getId(), checkoutRequest());
+
+        orderService.updateOrderStatus(firstOrder.id(), OrderStatus.CONFIRMED);
+
+        assertThatThrownBy(() ->
+                orderService.updateOrderStatus(secondOrder.id(), OrderStatus.CONFIRMED)
+        )
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("Insufficient stock");
+        assertThat(orderService.getOrderById(secondUser.getId(), secondOrder.id()).status())
+                .isEqualTo(OrderStatus.PENDING);
+        assertThat(productRepository.findById(product.getId()).orElseThrow().getStockQuantity())
+                .isEqualTo(1);
+    }
+
+    @Test
+    void checkoutRejectsExcessiveQuantity() {
+        AppUser user = createUser("quantity-limit-buyer@example.com");
+        Product product = createProduct(20);
+        cartItemRepository.save(new CartItem(user, product, 11));
+
+        assertThatThrownBy(() -> orderService.checkout(user.getId(), checkoutRequest()))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("must not exceed 10");
+
+        assertThat(orderRepository.count()).isZero();
+        assertThat(productRepository.findById(product.getId()).orElseThrow().getStockQuantity())
+                .isEqualTo(20);
     }
 
     @Test

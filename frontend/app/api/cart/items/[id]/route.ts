@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { proxyAuthenticatedBackend } from "@/lib/api/backend-proxy";
+import { rejectInvalidCsrfOrigin } from "@/lib/security/csrf";
 
 interface CartItemRouteContext {
   params: Promise<{ id: string }>;
@@ -17,6 +18,9 @@ async function cartItemPath(context: CartItemRouteContext) {
 }
 
 export async function PUT(request: Request, context: CartItemRouteContext) {
+  const csrfFailure = rejectInvalidCsrfOrigin(request);
+  if (csrfFailure) return csrfFailure;
+
   const path = await cartItemPath(context);
 
   if (!path) {
@@ -30,9 +34,12 @@ export async function PUT(request: Request, context: CartItemRouteContext) {
 }
 
 export async function DELETE(
-  _request: Request,
+  request: Request,
   context: CartItemRouteContext,
 ) {
+  const csrfFailure = rejectInvalidCsrfOrigin(request);
+  if (csrfFailure) return csrfFailure;
+
   const path = await cartItemPath(context);
 
   if (!path) {

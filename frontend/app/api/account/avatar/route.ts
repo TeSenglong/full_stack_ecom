@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { proxyAuthenticatedBackend } from "@/lib/api/backend-proxy";
+import { rejectInvalidCsrfOrigin } from "@/lib/security/csrf";
 
 const MAX_AVATAR_SIZE = 5 * 1024 * 1024;
 const ALLOWED_AVATAR_TYPES = new Set([
@@ -10,6 +11,9 @@ const ALLOWED_AVATAR_TYPES = new Set([
 ]);
 
 export async function POST(request: Request) {
+  const csrfFailure = rejectInvalidCsrfOrigin(request);
+  if (csrfFailure) return csrfFailure;
+
   const formData = await request.formData();
   const file = formData.get("file");
 
@@ -43,7 +47,10 @@ export async function POST(request: Request) {
   });
 }
 
-export async function DELETE() {
+export async function DELETE(request: Request) {
+  const csrfFailure = rejectInvalidCsrfOrigin(request);
+  if (csrfFailure) return csrfFailure;
+
   return proxyAuthenticatedBackend("/account/avatar", {
     method: "DELETE",
   });

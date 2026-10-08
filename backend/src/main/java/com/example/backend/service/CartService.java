@@ -1,5 +1,6 @@
 package com.example.backend.service;
 
+import com.example.backend.config.ShoppingLimits;
 import com.example.backend.dto.cart.AddToCartRequest;
 import com.example.backend.dto.cart.CartItemResponse;
 import com.example.backend.dto.cart.CartSummaryResponse;
@@ -57,6 +58,7 @@ public class CartService {
 
         if (item != null) {
             int newQuantity = item.getQuantity() + request.quantity();
+            validateQuantity(newQuantity);
             if (newQuantity > product.getStockQuantity()) {
                 throw new BadRequestException(
                         "Cannot add " + request.quantity() + " more items. Total requested (" 
@@ -66,6 +68,16 @@ public class CartService {
             item.setQuantity(newQuantity);
             return CartItemResponse.from(cartItemRepository.save(item));
         }
+
+        if (cartItemRepository.countByUserId(userId) >= ShoppingLimits.MAX_DISTINCT_CART_ITEMS) {
+            throw new BadRequestException(
+                    "Cart cannot contain more than "
+                            + ShoppingLimits.MAX_DISTINCT_CART_ITEMS
+                            + " different products"
+            );
+        }
+
+        validateQuantity(request.quantity());
 
         if (request.quantity() > product.getStockQuantity()) {
             throw new BadRequestException(
@@ -85,6 +97,8 @@ public class CartService {
     public CartItemResponse updateQuantity(Long userId, Long cartItemId, int quantity) {
         CartItem item = cartItemRepository.findByIdAndUserId(cartItemId, userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cart item not found with id: " + cartItemId));
+
+        validateQuantity(quantity);
 
         if (quantity > item.getProduct().getStockQuantity()) {
             throw new BadRequestException(
@@ -108,5 +122,15 @@ public class CartService {
     @Transactional
     public void clearCart(Long userId) {
         cartItemRepository.deleteByUserId(userId);
+    }
+
+    private void validateQuantity(int quantity) {
+        if (quantity > ShoppingLimits.MAX_QUANTITY_PER_PRODUCT) {
+            throw new BadRequestException(
+                    "Quantity must not exceed "
+                            + ShoppingLimits.MAX_QUANTITY_PER_PRODUCT
+                            + " per product"
+            );
+        }
     }
 }
