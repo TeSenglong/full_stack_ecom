@@ -240,15 +240,14 @@ export default function HomePage({ productsPromise }: HomePageProps) {
               <div className="mb-4 flex items-center gap-2">
                 <span className="h-px w-8 bg-secondary" />
                 <span className="text-xs font-semibold uppercase tracking-[0.12em] text-secondary">
-                  The ATELIER &amp; CO. collection
+                  Nextjs &amp; Springboot 
                 </span>
               </div>
               <h1 className="max-w-2xl font-serif text-5xl font-semibold leading-[1.02] tracking-tight text-primary md:text-6xl">
                 Everyday style, selected for you.
               </h1>
               <p className="mt-6 max-w-xl text-lg leading-relaxed text-on-surface-variant">
-                Shop clothing, footwear, accessories, souvenirs, and everyday
-                finds from one simple online catalog.
+                This website using render free service ( 15 min sleep time and take time to wake up the server  ) so it will be slow when idle . so please be patient . the backend is spring boot + postgresql and the frontend is nextjs .
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
