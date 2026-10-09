@@ -159,14 +159,7 @@ export function AdminProductTable({
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="max-w-72 pl-4">
-                      <div className="truncate font-medium">{product.name}</div>
-                      {releaseDate && (
-                        <div className="text-xs text-muted-foreground">
-                          Released {releaseDate}
-                        </div>
-                      )}
-                    </TableCell>
+
                     <TableCell className="font-mono text-xs">
                       {product.sku}
                     </TableCell>
