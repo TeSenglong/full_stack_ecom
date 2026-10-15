@@ -16,6 +16,9 @@ import com.example.backend.repository.OrderItemRepository;
 import com.example.backend.repository.OrderRepository;
 import com.example.backend.repository.ProductRepository;
 import com.example.backend.service.OrderService;
+import jakarta.persistence.EntityManagerFactory;
+import org.hibernate.SessionFactory;
+import org.hibernate.stat.Statistics;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,7 +37,7 @@ import java.util.concurrent.TimeUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@SpringBootTest
+@SpringBootTest(properties = "spring.jpa.properties.hibernate.generate_statistics=true")
 @ActiveProfiles("test")
 class OrderServiceIntegrationTests {
 
@@ -58,6 +61,9 @@ class OrderServiceIntegrationTests {
 
     @Autowired
     private AppUserRepository userRepository;
+
+    @Autowired
+    private EntityManagerFactory entityManagerFactory;
 
     @BeforeEach
     void cleanDatabase() {
@@ -254,6 +260,27 @@ class OrderServiceIntegrationTests {
         assertThat(adminPage.page()).isEqualTo(1);
         assertThat(adminPage.totalContents()).isEqualTo(3);
         assertThat(adminPage.last()).isTrue();
+    }
+
+    @Test
+    void adminOrderPageLoadsRelationshipsWithABoundedNumberOfQueries() {
+        Product product = createProduct(20);
+
+        for (int index = 0; index < 6; index++) {
+            AppUser user = createUser("query-count-" + index + "@example.com");
+            cartItemRepository.save(new CartItem(user, product, 1));
+            orderService.checkout(user.getId(), checkoutRequest());
+        }
+
+        Statistics statistics = entityManagerFactory
+                .unwrap(SessionFactory.class)
+                .getStatistics();
+        statistics.clear();
+
+        PageResponse<OrderResponse> page = orderService.getAllOrders(0, 20);
+
+        assertThat(page.content()).hasSize(6);
+        assertThat(statistics.getPrepareStatementCount()).isLessThanOrEqualTo(5);
     }
 
     private Object checkoutAfterSignal(CountDownLatch start, Long userId) throws InterruptedException {

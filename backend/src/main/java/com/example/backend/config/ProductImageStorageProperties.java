@@ -13,7 +13,7 @@ public record ProductImageStorageProperties(
         String bucket,
         String publicBaseUrl,
         DataSize maxFileSize
-) {
+) implements S3ImageStorageProperties {
     public ProductImageStorageProperties {
         if (maxFileSize == null) {
             maxFileSize = DataSize.ofMegabytes(5);

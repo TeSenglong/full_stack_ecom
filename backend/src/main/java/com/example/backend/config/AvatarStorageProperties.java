@@ -13,7 +13,7 @@ public record AvatarStorageProperties(
         String bucket,
         String publicBaseUrl,
         DataSize maxFileSize
-) {
+) implements S3ImageStorageProperties {
     public AvatarStorageProperties {
         if (maxFileSize == null) {
             maxFileSize = DataSize.ofMegabytes(5);

@@ -1,6 +1,6 @@
 package com.example.backend;
 
-import com.example.backend.config.ProductImageStorageProperties;
+import com.example.backend.config.CategoryImageStorageProperties;
 import com.example.backend.exception.BadRequestException;
 import com.example.backend.service.CategoryImageStorage;
 import com.example.backend.service.SupabaseS3CategoryImageStorage;
@@ -22,7 +22,7 @@ class SupabaseS3CategoryImageStorageTests {
     private final S3Client s3Client = mock(S3Client.class);
     private final SupabaseS3CategoryImageStorage storage = new SupabaseS3CategoryImageStorage(
             s3Client,
-            new ProductImageStorageProperties(
+            new CategoryImageStorageProperties(
                     true,
                     "https://project.storage.supabase.co/storage/v1/s3",
                     "ap-northeast-1",

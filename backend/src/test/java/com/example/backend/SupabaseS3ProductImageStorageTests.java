@@ -71,6 +71,15 @@ class SupabaseS3ProductImageStorageTests {
     }
 
     @Test
+    void missingContentTypeIsRejectedBeforeUpload() {
+        assertThatThrownBy(() -> storage.upload(
+                new MockMultipartFile("file", "product", null, new byte[] {1, 2, 3})
+        ))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage("Product image must be JPEG, PNG, or WebP");
+    }
+
+    @Test
     void spoofedImageContentIsRejectedBeforeUpload() {
         assertThatThrownBy(() -> storage.upload(
                 new MockMultipartFile("file", "product.png", "image/png", "not-an-image".getBytes())

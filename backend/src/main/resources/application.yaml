@@ -10,13 +10,17 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: ${JPA_DDL_AUTO:update}
+      ddl-auto: ${JPA_DDL_AUTO:validate}
     open-in-view: false
     show-sql: ${JPA_SHOW_SQL:false}
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        default_batch_fetch_size: 50
         format_sql: true
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: ${FLYWAY_BASELINE_ON_MIGRATE:false}
 
   servlet:
     multipart:
@@ -73,3 +77,12 @@ app:
       bucket: ${SUPABASE_PRODUCT_IMAGE_BUCKET:product-images}
       public-base-url: ${SUPABASE_STORAGE_PUBLIC_URL:}
       max-file-size: ${PRODUCT_IMAGE_MAX_FILE_SIZE:5MB}
+    category-image:
+      enabled: ${CATEGORY_IMAGE_STORAGE_ENABLED:false}
+      endpoint: ${SUPABASE_S3_ENDPOINT:}
+      region: ${SUPABASE_S3_REGION:}
+      access-key: ${SUPABASE_S3_ACCESS_KEY:}
+      secret-key: ${SUPABASE_S3_SECRET_KEY:}
+      bucket: ${SUPABASE_CATEGORY_IMAGE_BUCKET:category-images}
+      public-base-url: ${SUPABASE_STORAGE_PUBLIC_URL:}
+      max-file-size: ${CATEGORY_IMAGE_MAX_FILE_SIZE:5MB}
