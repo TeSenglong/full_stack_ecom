@@ -141,7 +141,27 @@ class AuthSecurityIntegrationTests {
         mockMvc.perform(post("/products")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(productJson(1L)))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized())
+                .andExpect(header().string(HttpHeaders.WWW_AUTHENTICATE, "Bearer"))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty())
+                .andExpect(jsonPath("$.status").value(401))
+                .andExpect(jsonPath("$.error").value("Unauthorized"))
+                .andExpect(jsonPath("$.message").value("Authentication is required"))
+                .andExpect(jsonPath("$.path").value("/products"));
+    }
+
+    @Test
+    void invalidBearerTokenReturnsConsistentUnauthorizedResponse() throws Exception {
+        mockMvc.perform(post("/products")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer not-a-valid-jwt")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(productJson(1L)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(header().string(HttpHeaders.WWW_AUTHENTICATE, "Bearer"))
+                .andExpect(jsonPath("$.status").value(401))
+                .andExpect(jsonPath("$.error").value("Unauthorized"))
+                .andExpect(jsonPath("$.message").value("Authentication is required"))
+                .andExpect(jsonPath("$.path").value("/products"));
     }
 
     @Test
@@ -156,7 +176,13 @@ class AuthSecurityIntegrationTests {
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(productJson(category.id())))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.timestamp").isNotEmpty())
+                .andExpect(jsonPath("$.status").value(403))
+                .andExpect(jsonPath("$.error").value("Forbidden"))
+                .andExpect(jsonPath("$.message")
+                        .value("You do not have permission to perform this action"))
+                .andExpect(jsonPath("$.path").value("/products"));
 
         assertEquals(0, productRepository.count());
     }

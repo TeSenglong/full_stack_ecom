@@ -1,9 +1,15 @@
 package com.example.backend.config;
 
+import com.example.backend.exception.ApiError;
 import com.example.backend.service.AppJwtAuthenticationConverter;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -14,8 +20,14 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.SecurityFilterChain;
+import tools.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.List;
 
 @Configuration
@@ -41,9 +53,38 @@ public class SecurityConfig {
     }
 
     @Bean
+    AuthenticationEntryPoint apiAuthenticationEntryPoint(
+            ObjectMapper objectMapper
+    ) {
+        return (request, response, exception) -> {
+            response.setHeader(HttpHeaders.WWW_AUTHENTICATE, "Bearer");
+            writeSecurityError(
+                    objectMapper,
+                    request,
+                    response,
+                    HttpStatus.UNAUTHORIZED,
+                    "Authentication is required"
+            );
+        };
+    }
+
+    @Bean
+    AccessDeniedHandler apiAccessDeniedHandler(ObjectMapper objectMapper) {
+        return (request, response, exception) -> writeSecurityError(
+                objectMapper,
+                request,
+                response,
+                HttpStatus.FORBIDDEN,
+                "You do not have permission to perform this action"
+        );
+    }
+
+    @Bean
     SecurityFilterChain securityFilterChain(
             HttpSecurity http,
-            AppJwtAuthenticationConverter jwtAuthenticationConverter
+            AppJwtAuthenticationConverter jwtAuthenticationConverter,
+            AuthenticationEntryPoint apiAuthenticationEntryPoint,
+            AccessDeniedHandler apiAccessDeniedHandler
     ) throws Exception {
         return http
                 .cors(Customizer.withDefaults())
@@ -55,6 +96,10 @@ public class SecurityConfig {
                         .sessionCreationPolicy(
                                 SessionCreationPolicy.STATELESS
                         )
+                )
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint(apiAuthenticationEntryPoint)
+                        .accessDeniedHandler(apiAccessDeniedHandler)
                 )
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
@@ -131,6 +176,8 @@ public class SecurityConfig {
                         .anyRequest().denyAll()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
+                        .authenticationEntryPoint(apiAuthenticationEntryPoint)
+                        .accessDeniedHandler(apiAccessDeniedHandler)
                         .jwt(jwt -> jwt
                                 .jwtAuthenticationConverter(
                                         jwtAuthenticationConverter
@@ -138,5 +185,28 @@ public class SecurityConfig {
                         )
                 )
                 .build();
+    }
+
+    private static void writeSecurityError(
+            ObjectMapper objectMapper,
+            HttpServletRequest request,
+            HttpServletResponse response,
+            HttpStatus status,
+            String message
+    ) throws IOException {
+        response.setStatus(status.value());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        objectMapper.writeValue(
+                response.getOutputStream(),
+                new ApiError(
+                        Instant.now(),
+                        status.value(),
+                        status.getReasonPhrase(),
+                        message,
+                        request.getRequestURI(),
+                        null
+                )
+        );
     }
 }
