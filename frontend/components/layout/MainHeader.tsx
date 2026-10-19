@@ -2,18 +2,12 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useCustomerCart } from "@/components/cart/CustomerCartProvider";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import ThemeToggle from "@/components/layout/ThemeToggle";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
 import { useAuth } from "@/hooks/useAuth";
+import { useScrollVisibility } from "@/hooks/useScrollVisibility";
 
 const NAV_LINKS = [
   { label: "Home", href: "/" },
@@ -36,54 +30,11 @@ export default function MainHeader() {
   const { user } = useAuth();
   const { cart, loading: cartLoading } = useCustomerCart();
   const [searchQuery, setSearchQuery] = useState("");
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isHidden, setIsHidden] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
-  const lastScrollTopRef = useRef(0);
-  const upwardScrollRef = useRef(0);
-
-  useEffect(() => {
-    lastScrollTopRef.current = window.scrollY;
-
-    const handleScroll = () => {
-      const scrollTop = Math.max(window.scrollY, 0);
-      const hideAfter = window.innerHeight / 2;
-      const showAfterScrollingUp = Math.max(window.innerHeight * 0.15, 100);
-      const difference = scrollTop - lastScrollTopRef.current;
-
-      setIsScrolled(scrollTop > 20);
-
-      if (scrollTop <= 20) {
-        setIsHidden(false);
-        upwardScrollRef.current = 0;
-        lastScrollTopRef.current = scrollTop;
-        return;
-      }
-
-      if (difference > 0) {
-        upwardScrollRef.current = 0;
-        if (scrollTop > hideAfter) {
-          setIsHidden(true);
-        }
-      } else if (difference < 0) {
-        upwardScrollRef.current += Math.abs(difference);
-
-        if (upwardScrollRef.current >= showAfterScrollingUp) {
-          setIsHidden(false);
-          upwardScrollRef.current = 0;
-        }
-      }
-
-      lastScrollTopRef.current = scrollTop;
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  const { isHidden, isScrolled } = useScrollVisibility();
 
   return (
     <header
-      className={`sticky top-0 z-50 w-full transition-all duration-500 ease-in-out ${isHidden && !mobileMenuOpen ? "-translate-y-full" : "translate-y-0"
+      className={`sticky top-0 z-50 w-full transition-all duration-500 ease-in-out ${isHidden ? "-translate-y-full" : "translate-y-0"
         } ${isScrolled
           ? "border-b border-outline/20 bg-surface/90 shadow-md backdrop-blur-xl"
           : "bg-surface"
@@ -111,18 +62,6 @@ export default function MainHeader() {
         </nav>
 
         <div className="flex shrink-0 items-center gap-2 sm:gap-4">
-          <button
-            type="button"
-            onClick={() => setMobileMenuOpen(true)}
-            aria-label="Open navigation menu"
-            aria-expanded={mobileMenuOpen}
-            aria-controls="mobile-navigation"
-            className="flex size-8 cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-foreground/10 lg:hidden"
-          >
-            <span className="material-symbols-outlined text-[23px]" aria-hidden="true">
-              menu
-            </span>
-          </button>
           <ThemeToggle />
           <form
             onSubmit={(event) => {
@@ -130,7 +69,7 @@ export default function MainHeader() {
               const query = searchQuery.trim();
               router.push(query ? `/products?q=${encodeURIComponent(query)}` : "/products");
             }}
-            className="hidden items-center gap-2 rounded bg-surface-low px-4 py-2 md:flex"
+            className="hidden items-center gap-2 rounded bg-surface-low px-4 py-2 lg:flex"
           >
             <span className="material-symbols-outlined text-[18px] text-outline">search</span>
             <input
@@ -155,7 +94,7 @@ export default function MainHeader() {
           <button
             type="button"
             aria-label="Wishlist"
-            className="relative hidden cursor-pointer p-1 transition-opacity hover:opacity-70 sm:block"
+            className="relative hidden cursor-pointer p-1 transition-opacity hover:opacity-70 lg:block"
           >
             <span className="material-symbols-outlined">favorite</span>
             <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-secondary text-[9px] text-on-secondary">
@@ -175,7 +114,7 @@ export default function MainHeader() {
           <Link
             href={!user ? "/login" : user.role === "ADMIN" ? "/admin" : "/account"}
             aria-label={!user ? "Log in" : `Account for ${user.displayName}`}
-            className="flex cursor-pointer items-center p-1 transition-opacity hover:opacity-70"
+            className="hidden cursor-pointer items-center p-1 transition-opacity hover:opacity-70 lg:flex"
           >
             {!user ? (
               <span className="material-symbols-outlined">person</span>
@@ -192,60 +131,6 @@ export default function MainHeader() {
           </Link>
         </div>
       </div>
-
-      <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-        <SheetContent
-          id="mobile-navigation"
-          side="left"
-          className="w-[min(86vw,22rem)] gap-0 border-outline/20 bg-surface p-0 text-on-surface lg:hidden"
-        >
-          <SheetHeader className="border-b border-outline/20 px-6 py-5">
-            <SheetTitle className="font-serif text-2xl font-semibold tracking-tight text-primary">
-              MOHAORI
-            </SheetTitle>
-            <SheetDescription className="sr-only">
-              Main navigation and catalog search
-            </SheetDescription>
-          </SheetHeader>
-
-          <div className="flex flex-1 flex-col overflow-y-auto px-6 py-6">
-            <nav className="flex flex-col" aria-label="Mobile navigation">
-              {NAV_LINKS.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  prefetch={link.href.startsWith("/about") ? false : undefined}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="border-b border-outline/15 py-4 text-sm font-medium uppercase tracking-[0.08em] text-on-surface-variant transition-colors hover:text-primary"
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </nav>
-
-            <form
-              onSubmit={(event) => {
-                event.preventDefault();
-                const query = searchQuery.trim();
-                setMobileMenuOpen(false);
-                router.push(query ? `/products?q=${encodeURIComponent(query)}` : "/products");
-              }}
-              className="mt-8 flex items-center gap-3 rounded-lg bg-surface-low px-4 py-3"
-            >
-              <span className="material-symbols-outlined text-[20px] text-outline" aria-hidden="true">
-                search
-              </span>
-              <input
-                aria-label="Search catalog"
-                placeholder="Search catalog..."
-                value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
-                className="min-w-0 flex-1 bg-transparent text-sm text-on-surface outline-none"
-              />
-            </form>
-          </div>
-        </SheetContent>
-      </Sheet>
     </header>
   );
 }

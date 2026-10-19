@@ -30,7 +30,13 @@ function statusLabel(status: string) {
   return status.charAt(0) + status.slice(1).toLowerCase();
 }
 
-export default function CustomerOrderHistory() {
+export default function CustomerOrderHistory({
+  pageSize = 10,
+  compact = false,
+}: {
+  pageSize?: number;
+  compact?: boolean;
+}) {
   const [orderPage, setOrderPage] = useState<OrderPage | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -38,7 +44,7 @@ export default function CustomerOrderHistory() {
   useEffect(() => {
     let cancelled = false;
 
-    void getCustomerOrders()
+    void getCustomerOrders(0, pageSize)
       .then((response) => {
         if (!cancelled) {
           setOrderPage(response);
@@ -63,14 +69,14 @@ export default function CustomerOrderHistory() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [pageSize]);
 
   async function loadPage(page: number) {
     setLoading(true);
     setError("");
 
     try {
-      setOrderPage(await getCustomerOrders(page));
+      setOrderPage(await getCustomerOrders(page, pageSize));
     } catch (loadError) {
       setError(
         loadError instanceof Error
@@ -180,7 +186,7 @@ export default function CustomerOrderHistory() {
         })}
       </div>
 
-      {orderPage.totalPages > 1 && (
+      {!compact && orderPage.totalPages > 1 && (
         <div className="mt-6 flex items-center justify-between border-t border-primary/10 pt-5">
           <p className="text-sm text-on-surface-variant">
             Page {orderPage.page + 1} of {orderPage.totalPages}

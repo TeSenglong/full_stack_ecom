@@ -1,5 +1,6 @@
 import MainFooter from "@/components/layout/MainFooter";
 import MainHeader from "@/components/layout/MainHeader";
+import MobileBottomNav from "@/components/layout/MobileBottomNav";
 import { CustomerCartProvider } from "@/components/cart/CustomerCartProvider";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -14,6 +15,7 @@ export default function StorefrontLayout({
         <MainHeader />
         <div className="flex-1">{children}</div>
         <MainFooter />
+        <MobileBottomNav />
         <Toaster position="bottom-right" richColors />
       </div>
     </CustomerCartProvider>

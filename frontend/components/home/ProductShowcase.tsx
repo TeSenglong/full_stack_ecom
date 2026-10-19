@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Autoplay, Navigation, Pagination } from "swiper/modules";
+import { Autoplay, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import ProductCard from "@/components/products/ProductCard";
 import type { ShowcaseProduct } from "@/types/product";
@@ -80,10 +80,9 @@ export default function ProductShowcase({
         </div>
       ) : (
         <Swiper
-          modules={[Navigation, Pagination, Autoplay]}
+          modules={[Pagination, Autoplay]}
           spaceBetween={24}
-          slidesPerView={1}
-          navigation
+          slidesPerView={2}
           pagination={{ clickable: true }}
           autoplay={{ delay: 5000, disableOnInteraction: false }}
           breakpoints={{
@@ -101,6 +100,7 @@ export default function ProductShowcase({
                 category={product.category || "Collection"}
                 image={product.imageUrl}
                 rating={product.rating}
+                reviewCount={product.reviews}
                 price={product.price}
                 originalPrice={product.originalPrice}
                 stockQuantity={product.stockQuantity}

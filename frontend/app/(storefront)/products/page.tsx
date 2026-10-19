@@ -1,65 +1,24 @@
 import type { Metadata } from "next";
-import { unstable_rethrow } from "next/navigation";
-import ProductsCatalog from "@/components/products/ProductsCatalog";
-import { getCategories } from "@/lib/api/categories";
-import { getProducts } from "@/lib/api/products";
-import type { Product } from "@/types/product";
+import { Suspense } from "react";
+import ProductsCatalogData, { type ProductsSearchParams } from "@/components/products/ProductsCatalogData";
+import ProductsCatalogLoading from "@/components/products/ProductsCatalogLoading";
+import ProductsPageLayout from "@/components/products/ProductsPageLayout";
 
 export const metadata: Metadata = {
   title: "The Collection | MOHAORI",
   description: "Explore the complete MOHAORI collection of considered objects for modern living.",
 };
 
-interface ProductsPageProps {
-  searchParams: Promise<{
-    q?: string | string[];
-    category?: string | string[];
-    sort?: string | string[];
-  }>;
-}
-
-function firstValue(value?: string | string[]) {
-  return Array.isArray(value) ? value[0] : value;
-}
-
-export default async function ProductsPage({ searchParams }: ProductsPageProps) {
-  const query = await searchParams;
-  const initialSearch = firstValue(query.q) ?? "";
-  const initialCategory = firstValue(query.category) ?? "all";
-  const initialSort = firstValue(query.sort) ?? "featured";
-  let products: Product[] = [];
-  let categoryOptions: string[] = [];
-  let loadError = false;
-
-  await Promise.all([
-    getProducts()
-      .then((data) => {
-        products = data;
-      })
-      .catch((error) => {
-        unstable_rethrow(error);
-        console.error("Unable to load the product catalog:", error);
-        loadError = true;
-      }),
-    getCategories()
-      .then((data) => {
-        categoryOptions = data.map((category) => category.name);
-      })
-      .catch((error) => {
-        unstable_rethrow(error);
-        console.error("Unable to load product filter categories:", error);
-      }),
-  ]);
-
+export default function ProductsPage({
+  searchParams,
+}: {
+  searchParams: Promise<ProductsSearchParams>;
+}) {
   return (
-    <ProductsCatalog
-      key={`${initialSearch}:${initialCategory}:${initialSort}`}
-      products={products}
-      categoryOptions={categoryOptions}
-      initialSearch={initialSearch}
-      initialCategory={initialCategory}
-      initialSort={initialSort}
-      loadError={loadError}
-    />
+    <ProductsPageLayout>
+      <Suspense fallback={<ProductsCatalogLoading />}>
+        <ProductsCatalogData searchParams={searchParams} />
+      </Suspense>
+    </ProductsPageLayout>
   );
 }

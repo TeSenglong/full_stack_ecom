@@ -2,12 +2,16 @@
 
 import { LoaderCircle, Minus, Plus, ShoppingBag } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import { useState, type MouseEvent } from "react";
+import { useState, useSyncExternalStore, type MouseEvent } from "react";
 import { toast } from "sonner";
 
 import { useCustomerCart } from "@/components/cart/CustomerCartProvider";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
+
+const subscribeToHydration = () => () => {};
+const getClientHydrationSnapshot = () => true;
+const getServerHydrationSnapshot = () => false;
 
 interface CustomerAddToCartButtonProps {
   productId: number | string;
@@ -17,6 +21,7 @@ interface CustomerAddToCartButtonProps {
   label?: string;
   unavailableLabel?: string;
   showIcon?: boolean;
+  mobileIconOnly?: boolean;
 }
 
 export function CustomerAddToCartButton({
@@ -27,6 +32,7 @@ export function CustomerAddToCartButton({
   label = "Cart",
   unavailableLabel = "Unavailable",
   showIcon = false,
+  mobileIconOnly = false,
 }: CustomerAddToCartButtonProps) {
   const { user, loading: authLoading } = useAuth();
   const {
@@ -39,11 +45,16 @@ export function CustomerAddToCartButton({
   const pathname = usePathname();
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
+  const hydrated = useSyncExternalStore(
+    subscribeToHydration,
+    getClientHydrationSnapshot,
+    getServerHydrationSnapshot,
+  );
   const numericProductId = Number(productId);
   const invalidProduct = !Number.isInteger(numericProductId) || numericProductId <= 0;
-  const cartItem = cart.items.find(
-    (item) => item.productId === numericProductId,
-  );
+  const cartItem = hydrated
+    ? cart.items.find((item) => item.productId === numericProductId)
+    : undefined;
 
   function redirectToLogin() {
     router.push(
@@ -112,7 +123,12 @@ export function CustomerAddToCartButton({
   }
 
   const isDisabled =
-    disabled || invalidProduct || submitting || authLoading || cartLoading;
+    disabled ||
+    invalidProduct ||
+    submitting ||
+    !hydrated ||
+    authLoading ||
+    cartLoading;
 
   if (cartItem) {
     return (
@@ -176,11 +192,17 @@ export function CustomerAddToCartButton({
       {showIcon && !submitting && !disabled && (
         <ShoppingBag className="size-4" aria-hidden="true" />
       )}
-      {disabled
-        ? unavailableLabel
-        : submitting
-          ? "Adding..."
-          : label}
+      <span
+        className={cn(
+          mobileIconOnly && !disabled && "sr-only sm:not-sr-only",
+        )}
+      >
+        {disabled
+          ? unavailableLabel
+          : submitting
+            ? "Adding..."
+            : label}
+      </span>
     </button>
   );
 }

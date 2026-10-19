@@ -3,6 +3,7 @@ package com.example.backend.service;
 import com.example.backend.dto.ProductRequest;
 import com.example.backend.dto.ProductResponse;
 import com.example.backend.dto.PageResponse;
+import com.example.backend.dto.ProductCatalogResponse;
 import com.example.backend.exception.BadRequestException;
 import com.example.backend.exception.ResourceNotFoundException;
 import com.example.backend.model.Category;
@@ -20,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -27,6 +29,13 @@ public class ProductService {
 
 	private static final Logger log = LoggerFactory.getLogger(ProductService.class);
 	private static final int MAX_SKU_GENERATION_ATTEMPTS = 10;
+	private static final Set<String> CATALOG_SORTS = Set.of(
+			"featured",
+			"newest",
+			"price-low",
+			"price-high",
+			"name"
+	);
 
 	private final ProductRepository productRepository;
 	private final CategoryRepository categoryRepository;
@@ -44,16 +53,64 @@ public class ProductService {
 
 	@Transactional(readOnly = true)
 	public PageResponse<ProductResponse> getAll(int page, int size) {
+		return getAll(page, size, null, null, "featured");
+	}
+
+	@Transactional(readOnly = true)
+	public PageResponse<ProductResponse> getAll(
+			int page,
+			int size,
+			String query,
+			String category,
+			String sort
+	) {
+		String normalizedSort = normalizeSort(sort);
 		return PageResponse.from(
-				productRepository.findAll(
-						PageRequestFactory.create(
-								page,
-								size,
-								Sort.by(Sort.Direction.ASC, "id")
-						)
+				productRepository.findCatalog(
+						normalizeFilter(query),
+						normalizeFilter(category),
+						normalizedSort,
+						PageRequestFactory.create(page, size, Sort.unsorted())
 				),
 				ProductResponse::from
 		);
+	}
+
+	@Transactional(readOnly = true)
+	public ProductCatalogResponse getCatalog(
+			int page,
+			int size,
+			String query,
+			String category,
+			String sort
+	) {
+		PageResponse<ProductResponse> products = getAll(
+				page,
+				size,
+				query,
+				category,
+				sort
+		);
+		var categories = categoryRepository
+				.findAll(Sort.by(Sort.Direction.ASC, "name"))
+				.stream()
+				.map(Category::getName)
+				.toList();
+
+		return new ProductCatalogResponse(products, categories);
+	}
+
+	private String normalizeFilter(String value) {
+		if (value == null || value.isBlank()) {
+			return null;
+		}
+
+		return value.trim();
+	}
+
+	private String normalizeSort(String sort) {
+		String normalized = sort == null ? "featured" : sort.trim().toLowerCase(Locale.ROOT);
+		return CATALOG_SORTS.contains(normalized) ? normalized : "featured";
 	}
 
 	@Transactional(readOnly = true)

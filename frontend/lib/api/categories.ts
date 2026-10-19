@@ -6,6 +6,7 @@ import { getBackendUrl } from "@/lib/api/backend-url"
 import type { Category, NewCategory } from "@/types/product"
 
 const API_TIMEOUT_MS = 5_000
+const CATEGORY_LIST_TIMEOUT_MS = 90_000
 
 function getCategoriesUrl() {
   return `${getBackendUrl()}/categories`
@@ -19,7 +20,7 @@ async function getErrorMessage(response: Response, fallback: string) {
 export async function getCategories(): Promise<Category[]> {
   const response = await fetch(getCategoriesUrl(), {
     cache: "no-store",
-    signal: AbortSignal.timeout(API_TIMEOUT_MS),
+    signal: AbortSignal.timeout(CATEGORY_LIST_TIMEOUT_MS),
   })
 
   if (!response.ok) {

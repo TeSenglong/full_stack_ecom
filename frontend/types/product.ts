@@ -34,7 +34,7 @@ export interface ShowcaseProduct {
   detail?: string;
   price: number;
   originalPrice?: number;
-  rating: number;
+  rating?: number | null;
   reviews?: number;
   imageUrl: string;
   category?: string;
@@ -50,6 +50,11 @@ export interface ProductPage {
   totalPages: number;
   first: boolean;
   last: boolean;
+}
+
+export interface ProductCatalog {
+  products: ProductPage;
+  categories: string[];
 }
 
 export interface NewProduct {

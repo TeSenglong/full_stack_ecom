@@ -130,6 +130,46 @@ class ProductControllerIntegrationTests {
 				.andExpect(jsonPath("$.message").value("size must be between 1 and 100"));
 	}
 
+	@Test
+	void catalogCanBeFilteredAndSorted() throws Exception {
+		CategoryResponse books = categoryService.create(new CategoryRequest("Books", null));
+		CategoryResponse decor = categoryService.create(new CategoryRequest("Decor", null));
+
+		mockMvc.perform(post("/products")
+					.with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN")))
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(productJson("Zebra Book", "29.99", 5, books.id())))
+				.andExpect(status().isCreated());
+		mockMvc.perform(post("/products")
+					.with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN")))
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(productJson("Alpha Book", "9.99", 5, books.id())))
+				.andExpect(status().isCreated());
+		mockMvc.perform(post("/products")
+					.with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN")))
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(productJson("Table Lamp", "19.99", 5, decor.id())))
+				.andExpect(status().isCreated());
+
+		mockMvc.perform(get("/products?q=book&category=Books&sort=name&page=0&size=10"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.totalContents").value(2))
+				.andExpect(jsonPath("$.content[0].name").value("Alpha Book"))
+				.andExpect(jsonPath("$.content[1].name").value("Zebra Book"));
+
+		mockMvc.perform(get("/products?category=Books&sort=price-high&page=0&size=10"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.content[0].name").value("Zebra Book"))
+				.andExpect(jsonPath("$.content[1].name").value("Alpha Book"));
+
+		mockMvc.perform(get("/products/catalog?q=book&category=Books&sort=name&page=0&size=10"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.products.totalContents").value(2))
+				.andExpect(jsonPath("$.products.content[0].name").value("Alpha Book"))
+				.andExpect(jsonPath("$.categories[0]").value("Books"))
+				.andExpect(jsonPath("$.categories[1]").value("Decor"));
+	}
+
 	private String productJson(String name, String price, int stockQuantity, Long categoryId) {
 		return """
 				{

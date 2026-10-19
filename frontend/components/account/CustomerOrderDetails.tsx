@@ -73,16 +73,16 @@ export default function CustomerOrderDetails({ orderId }: { orderId: number }) {
 
   if (loading) {
     return (
-      <main className="mx-auto flex min-h-[65vh] max-w-5xl items-center justify-center px-5 py-20 text-on-surface-variant">
+      <div className="flex min-h-96 items-center justify-center py-20 text-on-surface-variant">
         <LoaderCircle className="mr-2 size-5 animate-spin" />
         Loading order details...
-      </main>
+      </div>
     );
   }
 
   if (error || !order) {
     return (
-      <main className="mx-auto flex min-h-[65vh] max-w-xl items-center justify-center px-5 py-20 text-center">
+      <div className="flex min-h-96 items-center justify-center py-20 text-center">
         <div>
           <ReceiptText className="mx-auto size-12 text-primary" />
           <h1 className="mt-5 font-serif text-4xl font-semibold text-primary">
@@ -92,27 +92,27 @@ export default function CustomerOrderDetails({ orderId }: { orderId: number }) {
             {error || "We couldn't find this order."}
           </p>
           <Link
-            href="/account#orders"
+            href="/account/orders"
             className="mt-7 inline-flex items-center gap-2 rounded-md bg-primary px-6 py-3 font-medium text-on-primary"
           >
             <ArrowLeft className="size-4" />
             Back to your orders
           </Link>
         </div>
-      </main>
+      </div>
     );
   }
 
   const activeStep = ORDER_STEPS.indexOf(order.status);
 
   return (
-    <main className="mx-auto max-w-6xl px-5 py-12 md:px-8 lg:py-16">
+    <div>
       <Link
-        href="/account#orders"
+        href="/account/orders"
         className="inline-flex items-center gap-2 text-sm text-on-surface-variant hover:text-primary"
       >
         <ArrowLeft className="size-4" />
-        Back to your account
+        Back to your orders
       </Link>
 
       <div className="mt-6 flex flex-wrap items-end justify-between gap-5 border-b border-primary/10 pb-8">
@@ -278,6 +278,6 @@ export default function CustomerOrderDetails({ orderId }: { orderId: number }) {
           </section>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

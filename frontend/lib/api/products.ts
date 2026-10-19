@@ -1,6 +1,6 @@
 import "server-only";
 import { getBackendUrl } from "@/lib/api/backend-url";
-import type { NewProduct, Product, ProductPage } from "@/types/product";
+import type { NewProduct, Product, ProductCatalog, ProductPage } from "@/types/product";
 import { cookies } from "next/headers";
 
 const API_TIMEOUT_MS = 5_000;
@@ -9,6 +9,13 @@ const PRODUCT_LIST_TIMEOUT_MS = 30_000;
 const PRODUCT_LIST_MAX_ATTEMPTS = 3;
 const PRODUCT_LIST_RETRY_DELAY_MS = 2_000;
 const PRODUCT_LIST_PAGE_SIZE = 100;
+const STOREFRONT_CATALOG_TIMEOUT_MS = 90_000;
+
+export interface ProductPageFilters {
+  query?: string;
+  category?: string;
+  sort?: string;
+}
 
 function wait(milliseconds: number) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
@@ -29,17 +36,45 @@ async function requestProductPage(
   page: number,
   size: number,
   timeoutMs: number,
+  filters: ProductPageFilters = {},
 ): Promise<ProductPage> {
   const params = new URLSearchParams({
     page: String(page),
     size: String(size),
   });
+
+  if (filters.query?.trim()) params.set("q", filters.query.trim());
+  if (filters.category?.trim()) params.set("category", filters.category.trim());
+  if (filters.sort?.trim()) params.set("sort", filters.sort.trim());
+
   const response = await fetch(`${getProductsUrl()}?${params}`, {
     cache: "no-store",
     signal: AbortSignal.timeout(timeoutMs),
   });
 
   return parseResponse<ProductPage>(response, "Failed to fetch products");
+}
+
+export async function getProductCatalog(
+  page = 0,
+  size = 12,
+  filters: ProductPageFilters = {},
+): Promise<ProductCatalog> {
+  const params = new URLSearchParams({
+    page: String(page),
+    size: String(size),
+  });
+
+  if (filters.query?.trim()) params.set("q", filters.query.trim());
+  if (filters.category?.trim()) params.set("category", filters.category.trim());
+  if (filters.sort?.trim()) params.set("sort", filters.sort.trim());
+
+  const response = await fetch(`${getProductsUrl()}/catalog?${params}`, {
+    cache: "no-store",
+    signal: AbortSignal.timeout(STOREFRONT_CATALOG_TIMEOUT_MS),
+  });
+
+  return parseResponse<ProductCatalog>(response, "Failed to fetch the product catalog");
 }
 
 async function requestAllProducts(): Promise<Product[]> {
@@ -96,8 +131,9 @@ export async function getProducts(): Promise<Product[]> {
 export async function getProductPage(
   page = 0,
   size = 20,
+  filters: ProductPageFilters = {},
 ): Promise<ProductPage> {
-  return requestProductPage(page, size, API_TIMEOUT_MS);
+  return requestProductPage(page, size, PRODUCT_LIST_TIMEOUT_MS, filters);
 }
 
 export async function getProductById(id: string): Promise<Product> {

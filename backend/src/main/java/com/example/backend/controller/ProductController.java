@@ -2,6 +2,7 @@ package com.example.backend.controller;
 
 import com.example.backend.dto.ProductRequest;
 import com.example.backend.dto.ProductResponse;
+import com.example.backend.dto.ProductCatalogResponse;
 import com.example.backend.dto.PageResponse;
 import com.example.backend.service.ProductService;
 import jakarta.validation.Valid;
@@ -34,9 +35,23 @@ public class ProductController {
 	@GetMapping
 	public PageResponse<ProductResponse> getAll(
 			@RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "20") int size
+			@RequestParam(defaultValue = "20") int size,
+			@RequestParam(required = false) String q,
+			@RequestParam(required = false) String category,
+			@RequestParam(defaultValue = "featured") String sort
 	) {
-		return productService.getAll(page, size);
+		return productService.getAll(page, size, q, category, sort);
+	}
+
+	@GetMapping("/catalog")
+	public ProductCatalogResponse getCatalog(
+			@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "12") int size,
+			@RequestParam(required = false) String q,
+			@RequestParam(required = false) String category,
+			@RequestParam(defaultValue = "featured") String sort
+	) {
+		return productService.getCatalog(page, size, q, category, sort);
 	}
 
 	@GetMapping("/{id}")
