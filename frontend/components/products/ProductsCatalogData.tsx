@@ -80,7 +80,7 @@ export default async function ProductsCatalogData({
     });
   } catch (error) {
     unstable_rethrow(error);
-    console.error("Unable to load the product catalog:", error);
+    console.warn("Unable to load the product catalog:", error);
   }
 
   if (!catalog) {

@@ -168,6 +168,12 @@ class ProductControllerIntegrationTests {
 				.andExpect(jsonPath("$.products.content[0].name").value("Alpha Book"))
 				.andExpect(jsonPath("$.categories[0]").value("Books"))
 				.andExpect(jsonPath("$.categories[1]").value("Decor"));
+
+		mockMvc.perform(get("/products/catalog?page=0&size=10"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.products.totalContents").value(3))
+				.andExpect(jsonPath("$.categories[0]").value("Books"))
+				.andExpect(jsonPath("$.categories[1]").value("Decor"));
 	}
 
 	private String productJson(String name, String price, int stockQuantity, Long categoryId) {

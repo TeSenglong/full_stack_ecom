@@ -102,7 +102,7 @@ public class ProductService {
 
 	private String normalizeFilter(String value) {
 		if (value == null || value.isBlank()) {
-			return null;
+			return "";
 		}
 
 		return value.trim();

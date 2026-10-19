@@ -33,14 +33,14 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 					from Product p
 					join p.category c
 					where (
-							:query is null
+							:query = ''
 							or lower(p.name) like lower(concat('%', :query, '%'))
 							or lower(coalesce(p.description, '')) like lower(concat('%', :query, '%'))
 							or lower(coalesce(p.brand, '')) like lower(concat('%', :query, '%'))
 							or lower(p.sku) like lower(concat('%', :query, '%'))
 							or lower(c.name) like lower(concat('%', :query, '%'))
 					)
-					and (:category is null or lower(c.name) = lower(:category))
+					and (:category = '' or lower(c.name) = lower(:category))
 					order by
 						case when :sort = 'price-low' then coalesce(p.discountPrice, p.price) end asc,
 						case when :sort = 'price-high' then coalesce(p.discountPrice, p.price) end desc,
@@ -53,14 +53,14 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 					from Product p
 					join p.category c
 					where (
-							:query is null
+							:query = ''
 							or lower(p.name) like lower(concat('%', :query, '%'))
 							or lower(coalesce(p.description, '')) like lower(concat('%', :query, '%'))
 							or lower(coalesce(p.brand, '')) like lower(concat('%', :query, '%'))
 							or lower(p.sku) like lower(concat('%', :query, '%'))
 							or lower(c.name) like lower(concat('%', :query, '%'))
 					)
-					and (:category is null or lower(c.name) = lower(:category))
+					and (:category = '' or lower(c.name) = lower(:category))
 					"""
 	)
 	Page<Product> findCatalog(
