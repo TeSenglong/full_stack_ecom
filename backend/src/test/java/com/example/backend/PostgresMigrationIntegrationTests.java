@@ -38,6 +38,6 @@ class PostgresMigrationIntegrationTests {
         );
 
         assertThat(applicationTableCount).isEqualTo(6);
-        assertThat(successfulMigrationCount).isEqualTo(2);
+        assertThat(successfulMigrationCount).isEqualTo(3);
     }
 }
