@@ -16,6 +16,7 @@ import type { User } from "@/app/(auth)/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
+import { roleLabel } from "@/lib/auth/roles";
 
 const ACCOUNT_LINKS = [
   {
@@ -110,7 +111,7 @@ export default function CustomerAccountShell({
               </p>
               <span className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-surface-high px-2.5 py-1 text-xs font-medium text-primary">
                 <ShieldCheck className="size-3.5" />
-                {currentUser.role === "ADMIN" ? "Administrator" : "Customer"}
+                {roleLabel(currentUser.role)}
               </span>
             </div>
           </section>

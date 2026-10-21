@@ -4,11 +4,13 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "./globals.css";
+import "aos/dist/aos.css";
 import localFont from "next/font/local";
 import { cn } from "@/lib/utils";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider } from "./provider/authProvider";
+import AosInitializer from "@/components/AosInitializer";
 
 const geist = localFont({
   src: "./fonts/Geist-Variable.woff2",
@@ -46,6 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider>
           <TooltipProvider>
             <AuthProvider>
+              <AosInitializer />
               <div className="flex min-h-screen flex-col">
                 <div className="flex-1">{children}</div>
               </div>

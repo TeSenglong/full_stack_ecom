@@ -49,3 +49,17 @@ export async function requireAdmin(): Promise<User> {
 
   return user;
 }
+
+export async function requireStaff(): Promise<User> {
+  const user = await getServerCurrentUser();
+
+  if (!user) {
+    redirect("/login?next=%2Fstaff");
+  }
+
+  if (user.role !== "STAFF" && user.role !== "ADMIN") {
+    redirect("/");
+  }
+
+  return user;
+}

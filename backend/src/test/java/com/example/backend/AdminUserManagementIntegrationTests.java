@@ -70,9 +70,9 @@ class AdminUserManagementIntegrationTests {
         mockMvc.perform(patch("/admin/users/{id}/role", customer.getId())
                         .header("Authorization", bearer(admin))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"role\":\"ADMIN\"}"))
+                        .content("{\"role\":\"STAFF\"}"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.role").value("ADMIN"));
+                .andExpect(jsonPath("$.role").value("STAFF"));
 
         mockMvc.perform(patch("/admin/users/{id}/enabled", customer.getId())
                         .header("Authorization", bearer(admin))
@@ -82,7 +82,7 @@ class AdminUserManagementIntegrationTests {
                 .andExpect(jsonPath("$.enabled").value(false));
 
         AppUser changedUser = userRepository.findById(customer.getId()).orElseThrow();
-        assertEquals(UserRole.ADMIN, changedUser.getRole());
+        assertEquals(UserRole.STAFF, changedUser.getRole());
         assertFalse(changedUser.isEnabled());
 
         mockMvc.perform(get("/account")

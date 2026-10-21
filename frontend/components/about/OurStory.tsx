@@ -12,7 +12,11 @@ export default function OurStory() {
             <p className="mt-4 text-[15px] leading-relaxed text-on-surface-variant">I built the frontend with Next.js and TypeScript, developed the backend with Java and Spring Boot, and use PostgreSQL hosted on Supabase for data storage. Along the way, I have been implementing authentication, product and category management, image storage, pagination, security, and an admin dashboard.</p>
             <p className="mt-4 text-[15px] leading-relaxed text-on-surface-variant">MiniShop continues to evolve as I learn. Every new feature gives me an opportunity to improve the architecture, write better code, and gain practical experience building a modern full-stack application.</p>
           </div>
-          <div className="lg:col-span-7">
+          <div data-aos="fade-left"
+            data-aos-once="false"
+            data-aos-mirror="true"
+            suppressHydrationWarning
+            className="lg:col-span-7">
             <div className="relative aspect-4/3 overflow-hidden rounded-lg bg-surface-container shadow-lg">
               <Image
                 src="https://lzfudmcajnsccibezqgb.supabase.co/storage/v1/object/public/image/Minimal%20Full-Stack%20Architecture%20Diagram.png"

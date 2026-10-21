@@ -155,12 +155,12 @@ public class SecurityConfig {
                                 HttpMethod.GET,
                                 "/orders/admin",
                                 "/orders/admin/**"
-                        ).hasRole("ADMIN")
+                        ).hasAnyRole("STAFF", "ADMIN")
 
                         .requestMatchers(
                                 HttpMethod.PATCH,
                                 "/orders/*/status"
-                        ).hasRole("ADMIN")
+                        ).hasAnyRole("STAFF", "ADMIN")
 
                         .requestMatchers(
                                 "/account",
@@ -169,7 +169,7 @@ public class SecurityConfig {
                                 "/cart/**",
                                 "/orders",
                                 "/orders/**"
-                        ).hasAnyRole("USER", "ADMIN")
+                        ).hasAnyRole("USER", "STAFF", "ADMIN")
 
                         .requestMatchers("/error").permitAll()
 

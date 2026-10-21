@@ -4,10 +4,13 @@ import { LoaderCircleIcon } from "lucide-react"
 import { useActionState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 
-import { updateAdminOrderStatusAction } from "@/app/admin/orders/[id]/actions"
-import type { AdminOrderStatusActionState } from "@/app/admin/orders/[id]/actions"
 import { Button } from "@/components/ui/button"
-import type { AdminOrder, AdminOrderStatus } from "@/types/admin"
+import type {
+  AdminOrder,
+  AdminOrderStatus,
+  AdminOrderStatusAction,
+  AdminOrderStatusActionState,
+} from "@/types/admin"
 
 const INITIAL_STATE: AdminOrderStatusActionState = {
   status: "idle",
@@ -30,9 +33,15 @@ const ACTION_LABELS: Record<AdminOrderStatus, string> = {
   CANCELLED: "Cancel order",
 }
 
-export function AdminOrderStatusManager({ order }: { order: AdminOrder }) {
+export function AdminOrderStatusManager({
+  order,
+  updateStatusAction,
+}: {
+  order: AdminOrder
+  updateStatusAction: AdminOrderStatusAction
+}) {
   const router = useRouter()
-  const action = updateAdminOrderStatusAction.bind(null, String(order.id))
+  const action = updateStatusAction.bind(null, String(order.id))
   const [state, formAction, pending] = useActionState(action, INITIAL_STATE)
   const nextStatuses = NEXT_STATUSES[order.status]
 

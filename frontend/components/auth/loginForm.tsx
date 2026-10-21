@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
+import { roleHomePath } from "@/lib/auth/roles";
 
 interface LoginFormProps {
     className?: string;
@@ -49,8 +50,9 @@ export function LoginForm({ className }: LoginFormProps) {
                 !requestedDestination.startsWith("//")
                     ? requestedDestination
                     : "/";
-            const destination =
-                user.role === "ADMIN" ? "/admin" : safeDestination;
+            const destination = user.role === "USER"
+                ? safeDestination
+                : roleHomePath(user.role);
             window.location.replace(destination);
         } catch (error) {
             setError(

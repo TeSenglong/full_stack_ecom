@@ -49,7 +49,13 @@ function formatStatus(status: AdminOrderStatus) {
   return status.charAt(0) + status.slice(1).toLowerCase()
 }
 
-export function AdminDataTable({ orders }: { orders: AdminOrder[] }) {
+export function AdminDataTable({
+  orders,
+  ordersPath = "/admin/orders",
+}: {
+  orders: AdminOrder[]
+  ordersPath?: string
+}) {
   return (
     <section className="px-4 lg:px-6">
       <Card>
@@ -60,7 +66,7 @@ export function AdminDataTable({ orders }: { orders: AdminOrder[] }) {
           </div>
           <CardAction>
             <Link
-              href="/admin/orders"
+              href={ordersPath}
               className="text-sm font-medium underline-offset-4 hover:underline"
             >
               View all orders

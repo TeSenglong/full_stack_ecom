@@ -4,12 +4,10 @@ import { revalidatePath } from "next/cache"
 
 import { updateAdminOrderStatus } from "@/lib/api/admin-orders"
 import { requireAdmin } from "@/lib/auth/server"
-import type { AdminOrderStatus } from "@/types/admin"
-
-export interface AdminOrderStatusActionState {
-  status: "idle" | "success" | "error"
-  message: string
-}
+import type {
+  AdminOrderStatus,
+  AdminOrderStatusActionState,
+} from "@/types/admin"
 
 const ORDER_STATUSES = new Set<AdminOrderStatus>([
   "PENDING",
@@ -44,6 +42,9 @@ export async function updateAdminOrderStatusAction(
     revalidatePath("/admin")
     revalidatePath("/admin/orders")
     revalidatePath(`/admin/orders/${orderId}`)
+    revalidatePath("/staff")
+    revalidatePath("/staff/orders")
+    revalidatePath(`/staff/orders/${orderId}`)
 
     return {
       status: "success",

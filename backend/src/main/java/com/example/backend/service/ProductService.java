@@ -94,7 +94,7 @@ public class ProductService {
 		var categories = categoryRepository
 				.findAll(Sort.by(Sort.Direction.ASC, "name"))
 				.stream()
-				.map(Category::getName)
+				.map(c -> c.getName())
 				.toList();
 
 		return new ProductCatalogResponse(products, categories);

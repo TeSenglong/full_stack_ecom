@@ -4,6 +4,7 @@ import { Mail, ShieldCheck, UserRound } from "lucide-react";
 import CustomerAvatarManager from "@/components/account/CustomerAvatarManager";
 import CustomerDeactivateAccount from "@/components/account/CustomerDeactivateAccount";
 import { getServerCurrentUser } from "@/lib/auth/server";
+import { roleLabel } from "@/lib/auth/roles";
 
 export const metadata: Metadata = {
   title: "Account Settings | MOHAORI",
@@ -64,7 +65,7 @@ export default async function AccountSettingsPage() {
                   Account role
                 </dt>
                 <dd className="mt-2 font-medium text-primary">
-                  {user.role === "ADMIN" ? "Administrator" : "Customer"}
+                  {roleLabel(user.role)}
                 </dd>
               </div>
             </dl>

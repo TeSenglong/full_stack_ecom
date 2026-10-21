@@ -11,6 +11,7 @@ import Link from "next/link";
 
 import type { User } from "@/app/(auth)/auth";
 import CustomerOrderHistory from "@/components/account/CustomerOrderHistory";
+import { roleLabel } from "@/lib/auth/roles";
 
 const QUICK_LINKS = [
   {
@@ -122,7 +123,7 @@ export default function CustomerAccountPage({ user }: { user: User }) {
               Account role
             </dt>
             <dd className="mt-2 font-medium text-primary">
-              {user.role === "ADMIN" ? "Administrator" : "Customer"}
+              {roleLabel(user.role)}
             </dd>
           </div>
         </dl>

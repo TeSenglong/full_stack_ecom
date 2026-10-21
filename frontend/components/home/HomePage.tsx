@@ -72,54 +72,6 @@ function summarizeCategories(products: ShowcaseProduct[]) {
   return categoryMap;
 }
 
-async function HomeStats({
-  productsPromise,
-}: {
-  productsPromise: Promise<ShowcaseProduct[]>;
-}) {
-  const products = await productsPromise;
-  const categoryCount = summarizeCategories(products).size;
-  const inStockCount = products.filter(
-    (product) => (product.stockQuantity ?? 0) > 0,
-  ).length;
-
-  return (
-    <>
-      <div>
-        <dt className="text-xs text-on-surface-variant">Products</dt>
-        <dd className="mt-1 font-serif text-2xl font-semibold text-primary">
-          {products.length}
-        </dd>
-      </div>
-      <div>
-        <dt className="text-xs text-on-surface-variant">Categories</dt>
-        <dd className="mt-1 font-serif text-2xl font-semibold text-primary">
-          {categoryCount}
-        </dd>
-      </div>
-      <div>
-        <dt className="text-xs text-on-surface-variant">In stock</dt>
-        <dd className="mt-1 font-serif text-2xl font-semibold text-secondary">
-          {inStockCount}
-        </dd>
-      </div>
-    </>
-  );
-}
-
-function HomeStatsLoading() {
-  return (
-    <>
-      {["Products", "Categories", "In stock"].map((label) => (
-        <div key={label}>
-          <dt className="text-xs text-on-surface-variant">{label}</dt>
-          <dd className="mt-2 h-6 w-10 animate-pulse rounded bg-outline-variant/40" />
-        </div>
-      ))}
-    </>
-  );
-}
-
 async function HomeCategories({
   productsPromise,
 }: {
@@ -235,12 +187,12 @@ export default function HomePage({ productsPromise }: HomePageProps) {
       <main className="w-full">
 
         <section className="mx-auto max-w-350 px-5 pb-14 pt-6 md:px-8 md:pb-20 md:pt-8 lg:px-12 lg:pb-24 lg:pt-10">
-          <div className="grid items-center gap-12 lg:grid-cols-12">
-            <div className="lg:col-span-6">
-              <div className="mb-4 flex items-center gap-2">
+          <div className="grid items-stretch gap-12 lg:grid-cols-12">
+            <div className="flex flex-col lg:col-span-6">
+              <div className="mb-4 flex items-center gap-2 mt-10 md:mt-20 lg:mt-28">
                 <span className="h-px w-8 bg-secondary" />
                 <span className="text-xs font-semibold uppercase tracking-[0.12em] text-secondary">
-                  Nextjs &amp; Springboot 
+                  Nextjs &amp; Springboot
                 </span>
               </div>
               <h1 className="max-w-2xl font-serif text-5xl font-semibold leading-[1.02] tracking-tight text-primary md:text-6xl">
@@ -249,29 +201,27 @@ export default function HomePage({ productsPromise }: HomePageProps) {
               <p className="mt-6 max-w-xl text-lg leading-relaxed text-on-surface-variant">
                 This website using render free service ( 15 min sleep time and take time to wake up the server  ) so it will be slow when idle . so please be patient . the backend is spring boot + postgresql and the frontend is nextjs .
               </p>
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+
+              <div data-aos="fade-up"
+                data-aos-once="false"
+                data-aos-mirror="true"
+                suppressHydrationWarning className="mt-8 flex flex-col gap-3 sm:flex-row lg:mt-auto lg:pt-10">
                 <Link
                   href="/products"
                   className="rounded-md bg-primary px-8 py-3.5 text-center text-sm font-semibold uppercase tracking-[0.07em] text-on-primary shadow-sm transition-opacity hover:opacity-90"
                 >
                   Shop all products
                 </Link>
-                <a
-                  href="#categories"
+                <Link
+                  href="/categories"
                   className="flex items-center justify-center gap-2 rounded-md border border-primary/15 bg-surface-low px-8 py-3.5 text-center text-sm font-semibold uppercase tracking-[0.07em] text-primary transition-colors hover:bg-surface-high"
                 >
                   Browse categories
                   <span className="material-symbols-outlined text-lg">
                     arrow_downward
                   </span>
-                </a>
+                </Link>
               </div>
-
-              <dl className="mt-10 grid grid-cols-3 gap-3 rounded-lg border border-outline/10 bg-surface-low p-4">
-                <Suspense fallback={<HomeStatsLoading />}>
-                  <HomeStats productsPromise={productsPromise} />
-                </Suspense>
-              </dl>
             </div>
 
             <div className="lg:col-span-6">
@@ -288,9 +238,12 @@ export default function HomePage({ productsPromise }: HomePageProps) {
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-black/75 via-black/5 to-transparent" />
-                <div className="absolute inset-x-0 bottom-0 p-7 text-white md:p-9">
+                <div data-aos="fade-up"
+                  data-aos-once="false"
+                  data-aos-mirror="true"
+                  suppressHydrationWarning className="absolute inset-x-0 bottom-0 p-7 text-white md:p-9">
                   <p className="text-xs font-semibold uppercase tracking-[0.12em] text-white/75">
-                     Featured collection
+                    Featured collection
                   </p>
                   <h2 className="mt-2 font-serif text-3xl font-semibold">
                     Explore our latest products

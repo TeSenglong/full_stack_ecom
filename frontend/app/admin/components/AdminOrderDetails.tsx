@@ -22,7 +22,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import type { AdminOrder } from "@/types/admin"
+import type { AdminOrder, AdminOrderStatusAction } from "@/types/admin"
 
 const currency = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -37,7 +37,17 @@ const dateTime = new Intl.DateTimeFormat("en-US", {
   minute: "2-digit",
 })
 
-export function AdminOrderDetails({ order }: { order: AdminOrder }) {
+export function AdminOrderDetails({
+  order,
+  ordersPath,
+  productPath,
+  updateStatusAction,
+}: {
+  order: AdminOrder
+  ordersPath: string
+  productPath: string
+  updateStatusAction: AdminOrderStatusAction
+}) {
   const itemCount = order.items.reduce(
     (total, item) => total + item.quantity,
     0,
@@ -47,7 +57,7 @@ export function AdminOrderDetails({ order }: { order: AdminOrder }) {
     <section className="space-y-6 px-4 py-6 lg:px-6">
       <nav aria-label="Breadcrumb">
         <Link
-          href="/admin/orders"
+          href={ordersPath}
           className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeftIcon className="size-4" aria-hidden="true" />
@@ -113,7 +123,7 @@ export function AdminOrderDetails({ order }: { order: AdminOrder }) {
                   </div>
                   <div className="min-w-0 self-center">
                     <Link
-                      href={`/admin/products/${item.productId}`}
+                      href={`${productPath}/${item.productId}`}
                       className="line-clamp-2 font-medium hover:underline"
                     >
                       {item.productName}
@@ -139,7 +149,10 @@ export function AdminOrderDetails({ order }: { order: AdminOrder }) {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <AdminOrderStatusManager order={order} />
+              <AdminOrderStatusManager
+                order={order}
+                updateStatusAction={updateStatusAction}
+              />
             </CardContent>
           </Card>
         </div>

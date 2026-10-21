@@ -16,7 +16,7 @@ function parsePage(value: string | string[] | undefined) {
 
 function parseRole(value: string | string[] | undefined) {
   const role = firstValue(value)?.toUpperCase()
-  return role === "USER" || role === "ADMIN"
+  return role === "USER" || role === "STAFF" || role === "ADMIN"
     ? (role as AdminUserRole)
     : undefined
 }
@@ -60,8 +60,8 @@ export default async function AdminUsersPage({
         </p>
         <h1 className="mt-2 text-2xl font-semibold">User management</h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-          Review customer accounts, manage administrator access, and suspend
-          compromised accounts.
+          Review customer accounts, assign staff or administrator access, and
+          suspend compromised accounts.
         </p>
       </div>
 

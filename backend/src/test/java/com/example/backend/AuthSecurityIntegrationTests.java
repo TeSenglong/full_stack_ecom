@@ -32,6 +32,8 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -204,6 +206,45 @@ class AuthSecurityIntegrationTests {
                 .andExpect(jsonPath("$.name").value("Security Test Product"));
 
         assertEquals(1, productRepository.count());
+    }
+
+    @Test
+    void staffCanAccessOrderOperationsAndTheirOwnAccount() throws Exception {
+        register(EMAIL);
+        setRole(EMAIL, UserRole.STAFF);
+        String token = loginAndGetToken(EMAIL, PASSWORD);
+
+        mockMvc.perform(get("/account")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.role").value("STAFF"));
+
+        mockMvc.perform(get("/orders/admin")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(patch("/orders/999/status")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"CONFIRMED\"}"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void staffCannotManageUsersOrMutateTheCatalog() throws Exception {
+        register(EMAIL);
+        setRole(EMAIL, UserRole.STAFF);
+        String token = loginAndGetToken(EMAIL, PASSWORD);
+
+        mockMvc.perform(get("/admin/users")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(post("/products")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(productJson(1L)))
+                .andExpect(status().isForbidden());
     }
 
     @Test

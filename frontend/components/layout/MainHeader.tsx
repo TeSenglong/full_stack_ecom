@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import ThemeToggle from "@/components/layout/ThemeToggle";
 import { useAuth } from "@/hooks/useAuth";
 import { useScrollVisibility } from "@/hooks/useScrollVisibility";
+import { roleHomePath } from "@/lib/auth/roles";
 
 const NAV_LINKS = [
   { label: "Home", href: "/" },
@@ -112,7 +113,7 @@ export default function MainHeader() {
             </span>
           </Link>
           <Link
-            href={!user ? "/login" : user.role === "ADMIN" ? "/admin" : "/account"}
+            href={!user ? "/login" : roleHomePath(user.role)}
             aria-label={!user ? "Log in" : `Account for ${user.displayName}`}
             className="hidden cursor-pointer items-center p-1 transition-opacity hover:opacity-70 lg:flex"
           >

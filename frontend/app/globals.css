@@ -4,6 +4,14 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* @media (prefers-reduced-motion: reduce) {
+  [data-aos] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+} */
+
 @theme {
   --font-sans: "Hanken Grotesk", system-ui, sans-serif;
   --font-serif: "Newsreader", Georgia, serif;

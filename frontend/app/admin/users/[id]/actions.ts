@@ -14,7 +14,7 @@ export interface AdminUserActionState {
   message: string
 }
 
-const USER_ROLES = new Set<AdminUserRole>(["USER", "ADMIN"])
+const USER_ROLES = new Set<AdminUserRole>(["USER", "STAFF", "ADMIN"])
 
 function validUserId(userId: string) {
   return /^\d+$/.test(userId) && Number(userId) > 0

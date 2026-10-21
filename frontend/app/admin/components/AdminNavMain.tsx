@@ -27,7 +27,8 @@ export function AdminNavMain({
       <SidebarGroupContent>
         <SidebarMenu>
           {items.map((item) => {
-            const isActive = item.url === "/admin"
+            const isDashboard = item.url === "/admin" || item.url === "/staff"
+            const isActive = isDashboard
               ? pathname === item.url
               : pathname === item.url || pathname.startsWith(`${item.url}/`)
 

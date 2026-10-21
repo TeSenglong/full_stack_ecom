@@ -1,6 +1,7 @@
 import { notFound, unstable_rethrow } from "next/navigation"
 
 import { AdminOrderDetails } from "@/app/admin/components/AdminOrderDetails"
+import { updateAdminOrderStatusAction } from "@/app/admin/orders/[id]/actions"
 import { getAdminOrderById } from "@/lib/api/admin-orders"
 import { requireAdmin } from "@/lib/auth/server"
 
@@ -28,5 +29,12 @@ export default async function AdminOrderPage({
     throw error
   }
 
-  return <AdminOrderDetails order={order} />
+  return (
+    <AdminOrderDetails
+      order={order}
+      ordersPath="/admin/orders"
+      productPath="/admin/products"
+      updateStatusAction={updateAdminOrderStatusAction}
+    />
+  )
 }

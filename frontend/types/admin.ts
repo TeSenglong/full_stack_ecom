@@ -41,7 +41,7 @@ export interface AdminOrderPage {
   last: boolean
 }
 
-export type AdminUserRole = "USER" | "ADMIN"
+export type AdminUserRole = "USER" | "STAFF" | "ADMIN"
 
 export interface AdminUser {
   id: number
@@ -86,3 +86,14 @@ export interface AdminDashboardData {
   revenue: AdminRevenuePoint[]
   recentOrders: AdminOrder[]
 }
+
+export interface AdminOrderStatusActionState {
+  status: "idle" | "success" | "error"
+  message: string
+}
+
+export type AdminOrderStatusAction = (
+  orderId: string,
+  previousState: AdminOrderStatusActionState,
+  formData: FormData,
+) => Promise<AdminOrderStatusActionState>

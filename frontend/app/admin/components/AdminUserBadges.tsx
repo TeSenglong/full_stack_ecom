@@ -2,9 +2,15 @@ import { Badge } from "@/components/ui/badge"
 import type { AdminUserRole } from "@/types/admin"
 
 export function AdminUserRoleBadge({ role }: { role: AdminUserRole }) {
+  const label = role === "ADMIN"
+    ? "Administrator"
+    : role === "STAFF"
+      ? "Staff"
+      : "Customer"
+
   return (
-    <Badge variant={role === "ADMIN" ? "default" : "outline"}>
-      {role === "ADMIN" ? "Administrator" : "Customer"}
+    <Badge variant={role === "USER" ? "outline" : "default"}>
+      {label}
     </Badge>
   )
 }

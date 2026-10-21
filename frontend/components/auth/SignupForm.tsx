@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
+import { roleHomePath } from "@/lib/auth/roles";
 
 export function SignupForm({
   className,
@@ -59,7 +60,7 @@ export function SignupForm({
       await register({ email, displayName, password });
       const user = await login({ email, password });
 
-      router.replace(user.role === "ADMIN" ? "/admin" : "/");
+      router.replace(user.role === "USER" ? "/" : roleHomePath(user.role));
       router.refresh();
     } catch (error) {
       setError(

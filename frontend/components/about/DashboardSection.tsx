@@ -41,7 +41,10 @@ export default function DashboardSection() {
           </p>
         </div>
 
-        <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div data-aos="fade-up"
+          data-aos-once="false"
+          data-aos-mirror="true"
+          suppressHydrationWarning className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {DASHBOARD_FEATURES.map((feature, index) => (
             <article
               key={feature.title}
@@ -51,7 +54,7 @@ export default function DashboardSection() {
                 <ProgressiveImage
                   src={feature.imageUrl}
                   alt="MOHAORI admin dashboard overview"
-                  className="aspect-16/10 w-full"
+                // className="aspect-16/10 w-full"
                 />
               ) : (
                 <div className="flex aspect-16/10 items-center justify-center bg-surface-low">

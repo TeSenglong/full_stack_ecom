@@ -48,6 +48,7 @@ const STATUS_OPTIONS: Array<{ value: string; label: string }> = [
 function pageHref(
   page: number,
   query: string,
+  basePath: string,
   status?: AdminOrderStatus,
 ) {
   const searchParams = new URLSearchParams({ page: String(page) })
@@ -60,17 +61,19 @@ function pageHref(
     searchParams.set("status", status)
   }
 
-  return `/admin/orders?${searchParams}`
+  return `${basePath}?${searchParams}`
 }
 
 export function AdminOrderTable({
   orderPage,
   query,
   status,
+  basePath = "/admin/orders",
 }: {
   orderPage: AdminOrderPage
   query: string
   status?: AdminOrderStatus
+  basePath?: string
 }) {
   const currentPage = orderPage.page + 1
 
@@ -118,7 +121,7 @@ export function AdminOrderTable({
           </button>
           {(query || status) && (
             <Link
-              href="/admin/orders"
+              href={basePath}
               className={buttonVariants({ variant: "outline", size: "lg" })}
             >
               Reset
@@ -180,7 +183,7 @@ export function AdminOrderTable({
                   </TableCell>
                   <TableCell className="pr-4 text-right">
                     <Link
-                      href={`/admin/orders/${order.id}`}
+                      href={`${basePath}/${order.id}`}
                       className={buttonVariants({ variant: "outline", size: "sm" })}
                     >
                       View
@@ -209,7 +212,7 @@ export function AdminOrderTable({
                 </span>
               ) : (
                 <Link
-                  href={pageHref(currentPage - 1, query, status)}
+                  href={pageHref(currentPage - 1, query, basePath, status)}
                   className={buttonVariants({ variant: "outline", size: "sm" })}
                 >
                   Previous
@@ -226,7 +229,7 @@ export function AdminOrderTable({
                 </span>
               ) : (
                 <Link
-                  href={pageHref(currentPage + 1, query, status)}
+                  href={pageHref(currentPage + 1, query, basePath, status)}
                   className={buttonVariants({ variant: "outline", size: "sm" })}
                 >
                   Next
