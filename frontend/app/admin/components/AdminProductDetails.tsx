@@ -103,9 +103,13 @@ function ActionMessage({ state }: { state: ProductActionState }) {
 export function AdminProductDetails({
   product,
   categories,
+  readOnly = false,
+  backHref = "/admin/products",
 }: {
   product: Product
   categories: Category[]
+  readOnly?: boolean
+  backHref?: string
 }) {
   const category = getCategory(product)
   const stock = getStockPresentation(product.stockQuantity)
@@ -137,7 +141,7 @@ export function AdminProductDetails({
     <section className="space-y-6 px-4 py-6 lg:px-6">
       <nav aria-label="Breadcrumb">
         <Link
-          href="/admin/products"
+          href={backHref}
           className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeftIcon className="size-4" aria-hidden="true" />
@@ -178,7 +182,9 @@ export function AdminProductDetails({
             <CardHeader className="border-b">
               <CardTitle>Product information</CardTitle>
               <CardDescription>
-                Update the catalog details customers see and the inventory used at checkout.
+                {readOnly
+                  ? "View catalog details and inventory levels."
+                  : "Update the catalog details customers see and the inventory used at checkout."}
               </CardDescription>
             </CardHeader>
 
@@ -191,7 +197,7 @@ export function AdminProductDetails({
                     name="name"
                     defaultValue={product.name}
                     maxLength={200}
-                    disabled={updatePending}
+                    disabled={readOnly || updatePending}
                     required
                   />
                 </div>
@@ -205,7 +211,7 @@ export function AdminProductDetails({
                     defaultValue={product.price}
                     min="0"
                     step="0.01"
-                    disabled={updatePending}
+                    disabled={readOnly || updatePending}
                     required
                   />
                 </div>
@@ -219,7 +225,7 @@ export function AdminProductDetails({
                     defaultValue={product.discountPrice ?? ""}
                     min="0"
                     step="0.01"
-                    disabled={updatePending}
+                    disabled={readOnly || updatePending}
                   />
                   <p className="text-xs text-muted-foreground">
                     Leave empty when the product is not on sale.
@@ -235,7 +241,7 @@ export function AdminProductDetails({
                     defaultValue={product.stockQuantity}
                     min="0"
                     step="1"
-                    disabled={updatePending}
+                    disabled={readOnly || updatePending}
                     required
                   />
                 </div>
@@ -246,7 +252,7 @@ export function AdminProductDetails({
                     id="categoryId"
                     name="categoryId"
                     defaultValue={category?.id}
-                    disabled={updatePending}
+                    disabled={readOnly || updatePending}
                     required
                     className="h-8 w-full rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50"
                   >
@@ -268,7 +274,7 @@ export function AdminProductDetails({
                     name="brand"
                     defaultValue={product.brand ?? ""}
                     maxLength={120}
-                    disabled={updatePending}
+                    disabled={readOnly || updatePending}
                   />
                 </div>
 
@@ -280,7 +286,7 @@ export function AdminProductDetails({
                     type="date"
                     lang="en-GB"
                     defaultValue={product.releaseDate ?? ""}
-                    disabled={updatePending}
+                    disabled={readOnly || updatePending}
                   />
                   <p className="text-xs text-muted-foreground">
                     Select the complete date (DD/MM/YYYY).
@@ -296,7 +302,7 @@ export function AdminProductDetails({
                     defaultValue={product.imageUrl ?? ""}
                     maxLength={2048}
                     placeholder="https://example.com/product.jpg"
-                    disabled={updatePending}
+                    disabled={readOnly || updatePending}
                   />
                 </div>
 
@@ -308,25 +314,27 @@ export function AdminProductDetails({
                     defaultValue={product.description ?? ""}
                     maxLength={4000}
                     rows={8}
-                    disabled={updatePending}
+                    disabled={readOnly || updatePending}
                     className="w-full resize-y rounded-lg border border-input bg-transparent px-3 py-2 text-sm leading-6 outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50"
                   />
                 </div>
               </div>
 
-              <ActionMessage state={updateState} />
+              {!readOnly && <ActionMessage state={updateState} />}
             </CardContent>
 
-            <CardFooter className="justify-end gap-3">
-              <Button type="submit" size="lg" disabled={updatePending}>
-                {updatePending ? (
-                  <LoaderCircleIcon className="animate-spin" aria-hidden="true" />
-                ) : (
-                  <SaveIcon aria-hidden="true" />
-                )}
-                {updatePending ? "Saving…" : "Save changes"}
-              </Button>
-            </CardFooter>
+            {!readOnly && (
+              <CardFooter className="justify-end gap-3">
+                <Button type="submit" size="lg" disabled={updatePending}>
+                  {updatePending ? (
+                    <LoaderCircleIcon className="animate-spin" aria-hidden="true" />
+                  ) : (
+                    <SaveIcon aria-hidden="true" />
+                  )}
+                  {updatePending ? "Saving…" : "Save changes"}
+                </Button>
+              </CardFooter>
+            )}
           </Card>
         </form>
 
@@ -397,43 +405,45 @@ export function AdminProductDetails({
             </CardContent>
           </Card>
 
-          <Card className="ring-destructive/25">
-            <CardHeader>
-              <CardTitle className="text-destructive">Danger zone</CardTitle>
-              <CardDescription>
-                Permanently remove this product from the catalog. Products referenced by existing records may be protected from deletion.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <form
-                action={submitDelete}
-                onSubmit={(event) => {
-                  if (
-                    !window.confirm(
-                      `Delete “${product.name}”? This action cannot be undone.`,
-                    )
-                  ) {
-                    event.preventDefault()
-                  }
-                }}
-              >
-                <Button
-                  type="submit"
-                  variant="destructive"
-                  className="w-full"
-                  disabled={deletePending}
+          {!readOnly && (
+            <Card className="ring-destructive/25">
+              <CardHeader>
+                <CardTitle className="text-destructive">Danger zone</CardTitle>
+                <CardDescription>
+                  Permanently remove this product from the catalog. Products referenced by existing records may be protected from deletion.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <form
+                  action={submitDelete}
+                  onSubmit={(event) => {
+                    if (
+                      !window.confirm(
+                        `Delete “${product.name}”? This action cannot be undone.`,
+                      )
+                    ) {
+                      event.preventDefault()
+                    }
+                  }}
                 >
-                  {deletePending ? (
-                    <LoaderCircleIcon className="animate-spin" aria-hidden="true" />
-                  ) : (
-                    <Trash2Icon aria-hidden="true" />
-                  )}
-                  {deletePending ? "Deleting…" : "Delete product"}
-                </Button>
-              </form>
-              <ActionMessage state={deleteState} />
-            </CardContent>
-          </Card>
+                  <Button
+                    type="submit"
+                    variant="destructive"
+                    className="w-full"
+                    disabled={deletePending}
+                  >
+                    {deletePending ? (
+                      <LoaderCircleIcon className="animate-spin" aria-hidden="true" />
+                    ) : (
+                      <Trash2Icon aria-hidden="true" />
+                    )}
+                    {deletePending ? "Deleting…" : "Delete product"}
+                  </Button>
+                </form>
+                <ActionMessage state={deleteState} />
+              </CardContent>
+            </Card>
+          )}
         </aside>
       </div>
     </section>

@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { LayoutDashboardIcon, ShoppingCartIcon } from "lucide-react"
+import { BoxesIcon, LayoutDashboardIcon, ShoppingCartIcon } from "lucide-react"
 
 import type { User } from "@/app/(auth)/auth"
 import { AdminNavMain } from "@/app/admin/components/AdminNavMain"
@@ -26,6 +26,11 @@ const navigationItems = [
     title: "Orders",
     url: "/staff/orders",
     icon: <ShoppingCartIcon />,
+  },
+  {
+    title: "Products",
+    url: "/staff/products",
+    icon: <BoxesIcon />,
   },
 ]
 

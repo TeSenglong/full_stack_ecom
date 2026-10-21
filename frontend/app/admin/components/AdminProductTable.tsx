@@ -67,16 +67,20 @@ function stockBadge(product: Product) {
   }
 }
 
-function pageHref(page: number) {
-  return `/admin/products?page=${page}`
-}
-
 export function AdminProductTable({
   productPage,
+  readOnly = false,
+  basePath = "/admin/products",
 }: {
   productPage: ProductPage
+  readOnly?: boolean
+  basePath?: string
 }) {
   const currentPage = productPage.page + 1
+
+  function pageHref(page: number) {
+    return `${basePath}?page=${page}`
+  }
 
   return (
     <Card>
@@ -88,15 +92,17 @@ export function AdminProductTable({
             {productPage.totalContents === 1 ? "" : "s"} in the catalog
           </CardDescription>
         </div>
-        <CardAction>
-          <Link
-            href="/admin/products/newProduct"
-            className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
-          >
-            <PlusIcon aria-hidden="true" />
-            Add Product
-          </Link>
-        </CardAction>
+        {!readOnly && (
+          <CardAction>
+            <Link
+              href="/admin/products/newProduct"
+              className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+            >
+              <PlusIcon aria-hidden="true" />
+              Add Product
+            </Link>
+          </CardAction>
+        )}
       </CardHeader>
       <CardContent className="px-0">
         <Table>
@@ -182,7 +188,7 @@ export function AdminProductTable({
                     </TableCell>
                     <TableCell className="pr-4 text-right">
                       <Link
-                        href={`/admin/products/${product.id}`}
+                        href={`${basePath}/${product.id}`}
                         className={buttonVariants({ variant: "outline", size: "sm" })}
                       >
                         View
