@@ -14,7 +14,6 @@
 
 @theme {
   --font-sans: "Hanken Grotesk", system-ui, sans-serif;
-  --font-serif: "Newsreader", Georgia, serif;
   --color-primary: #2b3830;
   --color-primary-container: #3d4e49;
   --color-on-primary: #ffffff;
@@ -61,6 +60,26 @@ body {
   font-family: var(--font-sans);
 }
 
+.khmer-text,
+.localized-content:lang(km),
+.localized-content :lang(km):not(.material-symbols-outlined) {
+  /* English uses Geist; Khmer characters fall back to Kantumruy Pro. */
+  font-family: var(--font-sans), var(--font-khmer), sans-serif;
+  letter-spacing: normal;
+  line-height: 1.8;
+  text-transform: none;
+}
+
+.localized-content.font-serif:lang(km),
+.localized-content :lang(km).font-serif {
+  /* Preserve the English serif heading within mixed Khmer/English text. */
+  font-family: var(--font-newsreader), var(--font-khmer), Georgia, serif;
+}
+
+.catalog-content {
+  font-family: var(--font-sans);
+}
+
 button,
 input,
 select {
@@ -90,6 +109,7 @@ select {
 }
 
 @theme inline {
+  --font-serif: var(--font-newsreader), Georgia, serif;
   --font-heading: var(--font-sans);
   --font-sans: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);

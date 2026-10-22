@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { CustomerAddToCartButton } from "@/components/cart/CustomerAddToCartButton";
 import ProgressiveImage from "@/components/products/ProgressiveImage";
+import en from "@/messages/en.json";
+import type { Language, Messages } from "@/lib/i18n";
 
 interface ProductCardProps {
   id?: number | string;
@@ -15,6 +17,9 @@ interface ProductCardProps {
   originalPrice?: number;
   badge?: string;
   stockQuantity?: number;
+  labels?: Messages["productCard"];
+  language?: Language;
+  categoryLanguage?: Language;
 }
 
 export default function ProductCard({
@@ -28,6 +33,9 @@ export default function ProductCard({
   originalPrice,
   badge,
   stockQuantity,
+  labels = en.productCard,
+  language = "en",
+  categoryLanguage = "en",
 }: ProductCardProps) {
   const formatPrice = (value?: number | null) => {
     if (value == null || Number.isNaN(Number(value))) return "";
@@ -57,7 +65,7 @@ export default function ProductCard({
         {productHref ? (
           <Link
             href={productHref}
-            aria-label={`View ${name}`}
+            aria-label={`${labels.view} ${name}`}
             className="block h-full focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-primary"
           >
             {productImage}
@@ -71,8 +79,8 @@ export default function ProductCard({
       </div>
 
       <div className="flex flex-1 flex-col p-3 sm:p-5">
-        <p className="mb-1 hidden text-xs uppercase tracking-wide text-on-surface-variant sm:block">{category}</p>
-        <h3 className="mb-1.5 line-clamp-2 min-h-10 font-serif text-sm font-semibold leading-snug text-primary sm:min-h-0 sm:text-lg">
+        <p lang={categoryLanguage === "kh" ? "km" : "en"} className="catalog-content mb-1 hidden text-xs uppercase tracking-wide text-on-surface-variant sm:block">{category}</p>
+        <h3 lang="en" className="mb-1.5 line-clamp-2 min-h-10 font-serif text-sm font-semibold leading-snug text-primary sm:min-h-0 sm:text-lg">
           {productHref ? (
             <Link href={productHref} className="rounded-sm hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
               {name}
@@ -82,7 +90,7 @@ export default function ProductCard({
         {hasRating ? (
           <div
             className="mb-3 flex items-center gap-0.5 sm:gap-1"
-            aria-label={`Rated ${rating.toFixed(1)} out of 5${reviewCount ? ` from ${reviewCount} reviews` : ""}`}
+            aria-label={`${labels.rated} ${rating.toFixed(1)} ${labels.outOfFive}${reviewCount ? ` ${labels.from} ${reviewCount} ${labels.reviews}` : ""}`}
           >
             {[1, 2, 3, 4, 5].map((star) => (
               <svg
@@ -99,7 +107,7 @@ export default function ProductCard({
             </span>
           </div>
         ) : (
-          <p className="mb-3 text-[11px] text-on-surface-variant sm:text-xs">No reviews yet</p>
+          <p className="mb-3 text-[11px] text-on-surface-variant sm:text-xs">{labels.noReviews}</p>
         )}
 
         <div className="mt-auto flex items-end justify-between gap-2 sm:gap-3">
@@ -113,9 +121,11 @@ export default function ProductCard({
             <CustomerAddToCartButton
               productId={id}
               disabled={stockQuantity === 0}
-              label="Cart"
+              label={labels.cart}
+              unavailableLabel={labels.unavailable}
+              addingLabel={labels.adding}
               mobileIconOnly
-              className="min-h-10 min-w-10 shrink-0 px-3 py-2 sm:px-4"
+              className={`min-h-10 min-w-10 shrink-0 px-3 py-2 sm:px-4 ${language === "kh" ? "khmer-text" : ""}`}
             />
           )}
         </div>

@@ -6,6 +6,7 @@ import { Autoplay, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import ProductCard from "@/components/products/ProductCard";
 import type { ShowcaseProduct } from "@/types/product";
+import { useLanguage } from "@/app/provider/languageProvider";
 
 interface ProductShowcaseProps {
   products?: ShowcaseProduct[];
@@ -18,11 +19,13 @@ export default function ProductShowcase({
   filters,
   limit = 10,
 }: ProductShowcaseProps) {
+  const { language, messages } = useLanguage();
+  const text = messages.home.featured;
   const productCategories = Array.from(
     new Set(products.map((product) => product.category).filter(Boolean)),
   ) as string[];
   const availableFilters = filters ?? [
-    { key: "all", label: "All products" },
+    { key: "all", label: text.allProducts },
     ...productCategories.map((category) => ({
       key: category,
       label: category,
@@ -42,9 +45,9 @@ export default function ProductShowcase({
     <section id="bestsellers" className="mx-auto max-w-350 px-5 py-24 md:px-8 lg:px-12">
       <div className="mb-10 flex flex-col justify-between gap-4 md:flex-row md:items-end">
         <div>
-          <span className="text-[13px] uppercase tracking-[0.08em] text-secondary">Shop the catalog</span>
-          <h2 className="mt-1 font-serif text-[32px] font-semibold text-primary">Featured products</h2>
-          <p className="mt-2 text-sm text-on-surface-variant">Browse products and add available items directly to your shopping bag.</p>
+          <span className="text-[13px] uppercase tracking-[0.08em] text-secondary">{text.eyebrow}</span>
+          <h2 className="mt-1 font-serif text-[32px] font-semibold text-primary">{text.title}</h2>
+          <p className="mt-2 text-sm text-on-surface-variant">{text.description}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {availableFilters.map((filter) => {
@@ -54,11 +57,15 @@ export default function ProductShowcase({
                 type="button"
                 key={filter.key}
                 onClick={() => setActiveFilter(filter.key)}
+                aria-pressed={active}
                 className={`cursor-pointer rounded px-4 py-2 text-[12px] uppercase tracking-[0.06em] transition-colors ${
                   active ? "bg-primary text-on-primary" : "bg-surface-container text-on-surface"
                 }`}
               >
-                {filter.label}
+                <span
+                  lang={filter.key === "all" ? (language === "kh" ? "km" : "en") : "en"}
+                  className={filter.key === "all" ? undefined : "catalog-content"}
+                >{filter.label}</span>
               </button>
             );
           })}
@@ -67,14 +74,14 @@ export default function ProductShowcase({
 
       {visibleProducts.length === 0 ? (
         <div className="py-20 text-center">
-          <p className="text-lg font-medium text-primary">No products found in this category.</p>
+          <p className="text-lg font-medium text-primary">{text.empty}</p>
           {activeFilter !== "all" && (
             <button
               type="button"
               onClick={() => setActiveFilter("all")}
               className="mt-4 cursor-pointer rounded bg-primary px-6 py-2 text-[13px] font-medium uppercase text-on-primary"
             >
-              Show all products
+              {text.showAll}
             </button>
           )}
         </div>
@@ -97,14 +104,19 @@ export default function ProductShowcase({
               <ProductCard
                 id={product.id}
                 name={product.name}
-                category={product.category || "Collection"}
+                category={product.category || text.collection}
+                categoryLanguage={product.category ? "en" : language}
                 image={product.imageUrl}
                 rating={product.rating}
                 reviewCount={product.reviews}
                 price={product.price}
                 originalPrice={product.originalPrice}
                 stockQuantity={product.stockQuantity}
-                badge={typeof product.badge === "string" ? product.badge : product.badge?.label}
+                badge={product.originalPrice != null && product.originalPrice > product.price
+                  ? messages.productCard.sale
+                  : typeof product.badge === "string" ? product.badge : product.badge?.label}
+                labels={messages.productCard}
+                language={language}
               />
             </SwiperSlide>
           ))}
@@ -115,7 +127,7 @@ export default function ProductShowcase({
           href="/products"
           className="inline-flex items-center gap-2 rounded-md border border-primary/15 px-6 py-3 text-sm font-semibold text-primary transition-colors hover:bg-surface-low"
         >
-          View all products
+          {text.viewAll}
           <span className="material-symbols-outlined text-lg">east</span>
         </Link>
       </div>

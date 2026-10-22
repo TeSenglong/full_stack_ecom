@@ -1,38 +1,16 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import { Suspense } from "react";
+import { Suspense, use } from "react";
+import { useLanguage } from "@/app/provider/languageProvider";
 
 import ProductShowcase from "@/components/home/ProductShowcase";
 import ProductSkeleton from "@/components/products/ProductSkeleton";
 import ProgressiveImage from "@/components/products/ProgressiveImage";
 import type { ShowcaseProduct } from "@/types/product";
 
-const SHOPPING_STEPS = [
-  {
-    icon: "search",
-    title: "Explore the catalog",
-    description:
-      "Browse clothing, footwear, accessories, souvenirs, and new items added by the store team.",
-  },
-  {
-    icon: "person",
-    title: "Sign in securely",
-    description:
-      "Use your customer account to keep your shopping bag and orders connected to you.",
-  },
-  {
-    icon: "add_shopping_cart",
-    title: "Build your bag",
-    description:
-      "Choose the quantity you need while the storefront checks current stock and pricing.",
-  },
-  {
-    icon: "receipt_long",
-    title: "Checkout and review",
-    description:
-      "Place your order with delivery details, then review its status from your account.",
-  },
-];
+const SHOPPING_STEP_ICONS = ["search", "person", "add_shopping_cart", "receipt_long"];
 
 const FALLBACK_IMAGE =
   "https://lzfudmcajnsccibezqgb.supabase.co/storage/v1/object/public/image/Garments_arranged_on_dark_surface_20261008005847.jpg";
@@ -48,11 +26,11 @@ interface CategorySummary {
   imageUrl: string;
 }
 
-function summarizeCategories(products: ShowcaseProduct[]) {
+function summarizeCategories(products: ShowcaseProduct[], otherLabel: string) {
   const categoryMap = new Map<string, CategorySummary>();
 
   for (const product of products) {
-    const categoryName = product.category?.trim() || "Other products";
+    const categoryName = product.category?.trim() || otherLabel;
     const existing = categoryMap.get(categoryName);
 
     if (existing) {
@@ -72,13 +50,15 @@ function summarizeCategories(products: ShowcaseProduct[]) {
   return categoryMap;
 }
 
-async function HomeCategories({
+function HomeCategories({
   productsPromise,
 }: {
   productsPromise: Promise<ShowcaseProduct[]>;
 }) {
-  const products = await productsPromise;
-  const categories = Array.from(summarizeCategories(products).values()).slice(
+  const { language, messages } = useLanguage();
+  const text = messages.home.categories;
+  const products = use(productsPromise);
+  const categories = Array.from(summarizeCategories(products, text.other).values()).slice(
     0,
     4,
   );
@@ -87,10 +67,10 @@ async function HomeCategories({
     return (
       <div className="rounded-xl border border-dashed border-primary/20 bg-surface-lowest px-6 py-14 text-center">
         <h3 className="font-serif text-2xl font-semibold text-primary">
-          Categories are coming soon
+          {text.emptyTitle}
         </h3>
         <p className="mt-2 text-on-surface-variant">
-          New categories will appear here when products are added to the catalog.
+          {text.emptyDescription}
         </p>
       </div>
     );
@@ -106,18 +86,21 @@ async function HomeCategories({
         >
           <ProgressiveImage
             src={category.imageUrl || FALLBACK_IMAGE}
-            alt={`${category.name} collection`}
+            alt={`${category.name} — ${text.collection}`}
             className="aspect-4/3 w-full transition-transform duration-500 group-hover:scale-105"
           />
           <div className="p-5">
             <p className="text-xs font-semibold uppercase tracking-widest text-secondary">
-              {category.count} {category.count === 1 ? "product" : "products"}
+              {category.count} {category.count === 1 ? text.product : text.products}
             </p>
-            <h3 className="mt-1 font-serif text-2xl font-semibold text-primary">
+            <h3
+              lang={category.name === text.other ? (language === "kh" ? "km" : "en") : "en"}
+              className="catalog-content mt-1 font-serif text-2xl font-semibold text-primary"
+            >
               {category.name}
             </h3>
             <p className="mt-2 text-sm text-on-surface-variant">
-              View all products in this category.
+              {text.viewProducts}
             </p>
           </div>
         </Link>
@@ -146,29 +129,31 @@ function HomeCategoriesLoading() {
   );
 }
 
-async function HomeProductShowcase({
+function HomeProductShowcase({
   productsPromise,
 }: {
   productsPromise: Promise<ShowcaseProduct[]>;
 }) {
-  const products = await productsPromise;
+  const products = use(productsPromise);
 
   return <ProductShowcase products={products} />;
 }
 
 function HomeProductShowcaseLoading() {
+  const { messages } = useLanguage();
+  const text = messages.home.featured;
   return (
     <section className="mx-auto max-w-350 px-5 py-24 md:px-8 lg:px-12">
       <div className="mb-10 flex flex-col justify-between gap-4 md:flex-row md:items-end">
         <div>
           <span className="text-[13px] uppercase tracking-[0.08em] text-secondary">
-            Shop the catalog
+            {text.eyebrow}
           </span>
           <h2 className="mt-1 font-serif text-[32px] font-semibold text-primary">
-            Featured products
+            {text.title}
           </h2>
           <p className="mt-2 text-sm text-on-surface-variant">
-            The store is waking up. Products will appear shortly.
+            {text.loading}
           </p>
         </div>
       </div>
@@ -182,8 +167,14 @@ function HomeProductShowcaseLoading() {
 }
 
 export default function HomePage({ productsPromise }: HomePageProps) {
+  const { language, messages } = useLanguage();
+  const { hero, categories, experience, cta } = messages.home;
+
   return (
-    <div className="w-full bg-surface font-sans text-on-surface antialiased">
+    <div
+      lang={language === "kh" ? "km" : "en"}
+      className="localized-content w-full bg-surface font-sans text-on-surface antialiased"
+    >
       <main className="w-full">
 
         <section className="mx-auto max-w-350 px-5 pb-14 pt-6 md:px-8 md:pb-20 md:pt-8 lg:px-12 lg:pb-24 lg:pt-10">
@@ -192,14 +183,14 @@ export default function HomePage({ productsPromise }: HomePageProps) {
               <div className="mb-4 flex items-center gap-2 mt-10 md:mt-20 lg:mt-28">
                 <span className="h-px w-8 bg-secondary" />
                 <span className="text-xs font-semibold uppercase tracking-[0.12em] text-secondary">
-                  Nextjs &amp; Springboot
+                  {hero.eyebrow}
                 </span>
               </div>
               <h1 className="max-w-2xl font-serif text-5xl font-semibold leading-[1.02] tracking-tight text-primary md:text-6xl">
-                Everyday style, selected for you.
+                {hero.title}
               </h1>
               <p className="mt-6 max-w-xl text-lg leading-relaxed text-on-surface-variant">
-                This website using render free service ( 15 min sleep time and take time to wake up the server  ) so it will be slow when idle . so please be patient . the backend is spring boot + postgresql and the frontend is nextjs .
+                {hero.description}
               </p>
 
               <div data-aos="fade-up"
@@ -210,13 +201,13 @@ export default function HomePage({ productsPromise }: HomePageProps) {
                   href="/products"
                   className="rounded-md bg-primary px-8 py-3.5 text-center text-sm font-semibold uppercase tracking-[0.07em] text-on-primary shadow-sm transition-opacity hover:opacity-90"
                 >
-                  Shop all products
+                  {hero.shopProducts}
                 </Link>
                 <Link
                   href="/categories"
                   className="flex items-center justify-center gap-2 rounded-md border border-primary/15 bg-surface-low px-8 py-3.5 text-center text-sm font-semibold uppercase tracking-[0.07em] text-primary transition-colors hover:bg-surface-high"
                 >
-                  Browse categories
+                  {hero.browseCategories}
                   <span className="material-symbols-outlined text-lg">
                     arrow_downward
                   </span>
@@ -231,7 +222,7 @@ export default function HomePage({ productsPromise }: HomePageProps) {
               >
                 <Image
                   src={HOME_HERO_IMAGE}
-                  alt="MOHAORI fashion collection"
+                  alt={hero.imageAlt}
                   fill
                   preload
                   sizes="(min-width: 1400px) 650px, (min-width: 1024px) 50vw, 100vw"
@@ -243,10 +234,10 @@ export default function HomePage({ productsPromise }: HomePageProps) {
                   data-aos-mirror="true"
                   suppressHydrationWarning className="absolute inset-x-0 bottom-0 p-7 text-white md:p-9">
                   <p className="text-xs font-semibold uppercase tracking-[0.12em] text-white/75">
-                    Featured collection
+                    {hero.featuredCollection}
                   </p>
                   <h2 className="mt-2 font-serif text-3xl font-semibold">
-                    Explore our latest products
+                    {hero.exploreLatest}
                   </h2>
                 </div>
               </Link>
@@ -259,21 +250,20 @@ export default function HomePage({ productsPromise }: HomePageProps) {
             <div className="mb-10 flex flex-col justify-between gap-4 md:flex-row md:items-end">
               <div>
                 <span className="text-xs font-semibold uppercase tracking-[0.12em] text-secondary">
-                  Shop your way
+                  {categories.eyebrow}
                 </span>
                 <h2 className="mt-2 font-serif text-4xl font-semibold text-primary">
-                  Browse current categories
+                  {categories.title}
                 </h2>
                 <p className="mt-3 max-w-2xl text-on-surface-variant">
-                  These collections are created from the products currently
-                  available in the store.
+                  {categories.description}
                 </p>
               </div>
               <Link
                 href="/categories"
                 className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:opacity-70"
               >
-                View all categories
+                {categories.viewAll}
                 <span className="material-symbols-outlined text-lg">east</span>
               </Link>
             </div>
@@ -292,26 +282,25 @@ export default function HomePage({ productsPromise }: HomePageProps) {
           <div className="mx-auto max-w-350 px-5 md:px-8 lg:px-12">
             <div className="max-w-3xl">
               <span className="text-xs font-semibold uppercase tracking-[0.12em] text-[#ffb59d]">
-                A straightforward shopping experience
+                {experience.eyebrow}
               </span>
               <h2 className="mt-2 font-serif text-4xl font-semibold md:text-5xl">
-                From browsing to order history, everything stays connected.
+                {experience.title}
               </h2>
               <p className="mt-5 text-lg leading-relaxed text-on-brand/75">
-                The storefront uses live catalog data, customer accounts, a
-                persistent shopping bag, stock-aware checkout, and personal order records.
+                {experience.description}
               </p>
             </div>
 
             <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {SHOPPING_STEPS.map((step, index) => (
+              {experience.steps.map((step, index) => (
                 <article
-                  key={step.title}
+                  key={SHOPPING_STEP_ICONS[index]}
                   className="rounded-xl border border-white/10 bg-white/5 p-6"
                 >
                   <div className="flex items-center justify-between">
                     <span className="material-symbols-outlined text-3xl text-[#ffb59d]">
-                      {step.icon}
+                      {SHOPPING_STEP_ICONS[index]}
                     </span>
                     <span className="text-xs font-semibold text-white/45">
                       0{index + 1}
@@ -333,13 +322,13 @@ export default function HomePage({ productsPromise }: HomePageProps) {
           <div className="flex flex-col items-start justify-between gap-8 rounded-2xl border border-primary/10 bg-surface-low p-8 shadow-sm md:flex-row md:items-center md:p-12">
             <div>
               <span className="text-xs font-semibold uppercase tracking-[0.12em] text-secondary">
-                Ready to shop?
+                {cta.eyebrow}
               </span>
               <h2 className="mt-2 max-w-2xl font-serif text-4xl font-semibold text-primary">
-                Find something that fits your everyday.
+                {cta.title}
               </h2>
               <p className="mt-3 text-on-surface-variant">
-                Browse the catalog, sign in, and keep your cart and orders in one place.
+                {cta.description}
               </p>
             </div>
             <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
@@ -347,13 +336,13 @@ export default function HomePage({ productsPromise }: HomePageProps) {
                 href="/products"
                 className="rounded-md bg-primary px-7 py-3 text-center text-sm font-semibold text-on-primary"
               >
-                Browse products
+                {cta.browseProducts}
               </Link>
               <Link
                 href="/account"
                 className="rounded-md border border-primary/15 px-7 py-3 text-center text-sm font-semibold text-primary hover:bg-surface-high"
               >
-                My account
+                {cta.myAccount}
               </Link>
             </div>
           </div>

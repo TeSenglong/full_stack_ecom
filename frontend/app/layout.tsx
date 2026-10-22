@@ -6,6 +6,7 @@ import "swiper/css/pagination";
 import "./globals.css";
 import "aos/dist/aos.css";
 import localFont from "next/font/local";
+import { Kantumruy_Pro, Newsreader } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -15,6 +16,20 @@ import AosInitializer from "@/components/AosInitializer";
 const geist = localFont({
   src: "./fonts/Geist-Variable.woff2",
   variable: "--font-sans",
+  display: "swap",
+});
+
+const khmerFont = Kantumruy_Pro({
+  subsets: ["khmer", "latin"],
+  variable: "--font-khmer",
+  display: "swap",
+});
+
+const headingFont = Newsreader({
+  subsets: ["latin"],
+  axes: ["opsz"],
+  variable: "--font-newsreader",
+  adjustFontFallback: false,
   display: "swap",
 });
 
@@ -29,14 +44,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn("font-sans", geist.variable)}
+      className={cn("font-sans", geist.variable, khmerFont.variable, headingFont.variable)}
       data-scroll-behavior="smooth"
     >
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300..800;1,300..800&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300..800;1,300..800&display=swap"
           rel="stylesheet"
         />
         <link

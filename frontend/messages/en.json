@@ -1,0 +1,158 @@
+{
+  "nav": {
+    "_comment": "========== SHARED NAVIGATION TRANSLATIONS ==========",
+    "home": "Home",
+    "products": "Products",
+    "categories": "Categories",
+    "about": "About",
+    "shop": "Shop",
+    "search": "Search",
+    "account": "Account",
+    "mainNavigation": "Main navigation",
+    "mobileNavigation": "Mobile navigation",
+    "searchCatalog": "Search catalog",
+    "searchPlaceholder": "Search catalog...",
+    "clearSearch": "Clear search",
+    "wishlist": "Wishlist",
+    "shoppingBag": "Shopping bag",
+    "signInForBag": "Sign in to view your shopping bag",
+    "logIn": "Log in",
+    "accountFor": "Account for",
+    "selectLanguage": "Select language"
+  },
+  "home": {
+    "_comment": "========== HOME PAGE TRANSLATIONS ==========",
+    "hero": {
+      "eyebrow": "Nextjs & Springboot",
+      "title": "Everyday style, selected for you.",
+      "description": "This website using render free service ( 15 min sleep time and take time to wake up the server  ) so it will be slow when idle . so please be patient . the backend is spring boot + postgresql and the frontend is nextjs .",
+      "shopProducts": "Shop all products",
+      "browseCategories": "Browse categories",
+      "imageAlt": "MOHAORI fashion collection",
+      "featuredCollection": "Featured collection",
+      "exploreLatest": "Explore our latest products"
+    },
+    "categories": {
+      "eyebrow": "Shop your way",
+      "title": "Browse current categories",
+      "description": "These collections are created from the products currently available in the store.",
+      "viewAll": "View all categories",
+      "emptyTitle": "Categories are coming soon",
+      "emptyDescription": "New categories will appear here when products are added to the catalog.",
+      "other": "Other products",
+      "product": "product",
+      "products": "products",
+      "viewProducts": "View all products in this category.",
+      "collection": "collection"
+    },
+    "featured": {
+      "eyebrow": "Shop the catalog",
+      "title": "Featured products",
+      "description": "Browse products and add available items directly to your shopping bag.",
+      "loading": "The store is waking up. Products will appear shortly.",
+      "allProducts": "All products",
+      "empty": "No products found in this category.",
+      "showAll": "Show all products",
+      "viewAll": "View all products",
+      "collection": "Collection"
+    },
+    "experience": {
+      "eyebrow": "A straightforward shopping experience",
+      "title": "From browsing to order history, everything stays connected.",
+      "description": "The storefront uses live catalog data, customer accounts, a persistent shopping bag, stock-aware checkout, and personal order records.",
+      "steps": [
+        { "title": "Explore the catalog", "description": "Browse clothing, footwear, accessories, souvenirs, and new items added by the store team." },
+        { "title": "Sign in securely", "description": "Use your customer account to keep your shopping bag and orders connected to you." },
+        { "title": "Build your bag", "description": "Choose the quantity you need while the storefront checks current stock and pricing." },
+        { "title": "Checkout and review", "description": "Place your order with delivery details, then review its status from your account." }
+      ]
+    },
+    "cta": {
+      "eyebrow": "Ready to shop?",
+      "title": "Find something that fits your everyday.",
+      "description": "Browse the catalog, sign in, and keep your cart and orders in one place.",
+      "browseProducts": "Browse products",
+      "myAccount": "My account"
+    }
+  },
+  "about": {
+    "_comment": "========== ABOUT PAGE TRANSLATIONS ==========",
+    "hero": {
+      "eyebrow": "Self Initiated Project full-stack E-Commerce",
+      "title": "Next JS, Spring Boot & Postgresql",
+      "description": "MOHAORI is a full-stack e-commerce platform built with Next JS, Spring Boot and PostgreSQL. It is a platform for buying and selling products.",
+      "exploreProducts": "Explore the production page",
+      "readStory": "Read our story",
+      "imageAlt": "An artisan working carefully by hand",
+      "imageTitle": "“Full-stack E-Commerce”",
+      "imageDescription": "I have no experience in real work so i make this full-stack project to learn how to build a real work project"
+    },
+    "story": {
+      "eyebrow": "Our beginning",
+      "title": "Built from learning, curiosity, and a desire to create something real.",
+      "paragraphs": [
+        "MiniShop started as a personal project to turn what I was learning about software development into a complete, working e-commerce application. Instead of building only a frontend or a simple CRUD project, I wanted to understand how a real application works from the user interface all the way to the database.",
+        "I built the frontend with Next.js and TypeScript, developed the backend with Java and Spring Boot, and use PostgreSQL hosted on Supabase for data storage. Along the way, I have been implementing authentication, product and category management, image storage, pagination, security, and an admin dashboard.",
+        "MiniShop continues to evolve as I learn. Every new feature gives me an opportunity to improve the architecture, write better code, and gain practical experience building a modern full-stack application."
+      ],
+      "imageAlt": "Full-stack ecommerce architecture diagram"
+    },
+    "dashboard": {
+      "eyebrow": "Admin experience",
+      "title": "A focused dashboard for store management.",
+      "description": "The protected admin area brings catalog, order, and customer management together in one clear workspace.",
+      "imageAlt": "MOHAORI admin dashboard overview",
+      "features": [
+        { "title": "Dashboard Overview", "text": "The admin dashboard presents the store's key information in one place, making daily activity easier to understand and manage." },
+        { "title": "Catalog Management", "text": "Administrators can create, update, and remove products and categories while keeping prices, images, and stock information accurate." },
+        { "title": "Orders and Customers", "text": "The dashboard provides tools for reviewing orders, updating order status, and managing customer roles and account access." }
+      ]
+    },
+    "journey": {
+      "eyebrow": "My journey",
+      "title": "Education, skills, and ambition.",
+      "description": "My academic studies, technical courses, and hands-on projects are helping me grow into a well-rounded software developer.",
+      "values": [
+        { "title": "University", "text": "I am pursuing a bachelor's degree at Western University, where I am strengthening my knowledge, problem-solving abilities, and practical software development skills." },
+        { "title": "Frontend Development", "text": "I completed a short course at ISTAD focused on frontend development with React.js, where I learned to build responsive interfaces, reusable components, and interactive web applications." },
+        { "title": "Backend Development", "text": "I completed a short course at ISTAD focused on Java and Spring Boot, where I learned to develop REST APIs, connect databases, implement security, and structure backend applications." },
+        { "title": "Career Goal", "text": "Driven by a passion for technology, I continue learning, building projects, and strengthening my skills to become a professional software developer." }
+      ],
+      "ctaEyebrow": "See my work",
+      "ctaTitle": "Explore the full-stack project I built through this journey.",
+      "ctaButton": "Explore the project"
+    }
+  },
+  "productCard": {
+    "_comment": "========== SHARED PRODUCT CARD TRANSLATIONS ==========",
+    "view": "View",
+    "noReviews": "No reviews yet",
+    "cart": "Cart",
+    "adding": "Adding...",
+    "unavailable": "Unavailable",
+    "sale": "Sale",
+    "rated": "Rated",
+    "outOfFive": "out of 5",
+    "from": "from",
+    "reviews": "reviews"
+  },
+  "footer": {
+    "_comment": "========== SHARED FOOTER TRANSLATIONS ==========",
+    "eyebrow": "Exclusive Communiqué",
+    "title": "Join the MOHAORI Circle",
+    "description": "Receive invitations to private collection vernissages and 10% off your introductory commission.",
+    "emailLabel": "Email address",
+    "emailPlaceholder": "Enter your correspondence email",
+    "subscribe": "Subscribe",
+    "about": "MOHAORI is my self-initiated full-stack e-commerce project, built with Next.js, Spring Boot, and PostgreSQL to create a complete online shopping experience.",
+    "columns": [
+      { "title": "Shop", "links": ["New Releases", "All Products", "Browse Categories", "Furniture & Living", "Tailored Apparel", "Ceramics & Objects"] },
+      { "title": "About", "links": ["Our Philosophy", "Our Story", "Our Values", "The Collection"] },
+      { "title": "Client Services", "links": ["Order Tracking", "Custom Commissions", "Care & Restoration", "Returns Policy"] },
+      { "title": "Sustainability", "links": ["Material Provenance", "Carbon Ledger", "Circular Repair", "2024 Impact Dossier"] }
+    ],
+    "countryCurrency": "Country and currency",
+    "countries": ["United States (USD $)", "United Kingdom (GBP £)", "European Union (EUR €)", "Japan (JPY ¥)"],
+    "rights": "All rights reserved."
+  }
+}

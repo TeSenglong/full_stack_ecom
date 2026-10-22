@@ -20,6 +20,7 @@ interface CustomerAddToCartButtonProps {
   className?: string;
   label?: string;
   unavailableLabel?: string;
+  addingLabel?: string;
   showIcon?: boolean;
   mobileIconOnly?: boolean;
 }
@@ -31,6 +32,7 @@ export function CustomerAddToCartButton({
   className,
   label = "Cart",
   unavailableLabel = "Unavailable",
+  addingLabel = "Adding...",
   showIcon = false,
   mobileIconOnly = false,
 }: CustomerAddToCartButtonProps) {
@@ -200,7 +202,7 @@ export function CustomerAddToCartButton({
         {disabled
           ? unavailableLabel
           : submitting
-            ? "Adding..."
+            ? addingLabel
             : label}
       </span>
     </button>
