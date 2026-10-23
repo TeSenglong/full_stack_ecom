@@ -1,5 +1,5 @@
 import { AdminProductTable } from "@/app/admin/components/AdminProductTable"
-import { getProductPage } from "@/lib/api/products"
+import { getProducts } from "@/lib/api/products"
 import { requireStaff } from "@/lib/auth/server"
 
 const PRODUCTS_PER_PAGE = 20
@@ -19,7 +19,7 @@ export default async function StaffProductsPage({
   await requireStaff()
 
   const requestedPage = parsePage((await searchParams).page)
-  const productPage = await getProductPage(
+  const productPage = await getProducts(
     requestedPage - 1,
     PRODUCTS_PER_PAGE,
   )

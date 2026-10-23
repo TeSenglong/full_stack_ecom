@@ -25,7 +25,6 @@ export default function OurStory() {
           </div>
           <div data-aos="fade-left"
             data-aos-once="false"
-            data-aos-mirror="true"
             suppressHydrationWarning
             className="lg:col-span-7">
             <div className="relative aspect-4/3 overflow-hidden rounded-lg bg-surface-container shadow-lg">

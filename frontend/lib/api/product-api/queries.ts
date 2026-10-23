@@ -1,14 +1,12 @@
 import "server-only";
 
-import { getProductsUrl, parseApiResponse } from "@/lib/api/product-api/shared";
+import { getBackendUrl } from "@/lib/api/backend-url";
 import type { Product, ProductCatalog, ProductPage } from "@/types/product";
 
-const PRODUCT_DETAILS_TIMEOUT_MS = 5_000;
-const PRODUCT_LIST_TIMEOUT_MS = 30_000;
-const STOREFRONT_CATALOG_TIMEOUT_MS = 90_000;
-const ALL_PRODUCTS_PAGE_SIZE = 100;
-const ALL_PRODUCTS_MAX_ATTEMPTS = 3;
-const ALL_PRODUCTS_RETRY_DELAY_MS = 2_000;
+const REQUEST_TIMEOUT_MS = 90_000;
+const RETRY_DELAY_MS = 1_000;
+const MAX_REQUEST_ATTEMPTS = 2;
+const RETRYABLE_STATUS_CODES = new Set([502, 503, 504]);
 
 export interface ProductPageFilters {
   query?: string;
@@ -16,11 +14,62 @@ export interface ProductPageFilters {
   sort?: string;
 }
 
-function createPageParams(
-  page: number,
-  size: number,
-  filters: ProductPageFilters,
-): URLSearchParams {
+function wait(milliseconds: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
+}
+
+function isRetryableNetworkError(error: unknown): boolean {
+  return (
+    error instanceof TypeError ||
+    (error instanceof DOMException && error.name === "TimeoutError")
+  );
+}
+
+async function fetchBackend(
+  url: string,
+  errorMessage: string,
+): Promise<Response> {
+  for (let attempt = 1; attempt <= MAX_REQUEST_ATTEMPTS; attempt++) {
+    let response: Response;
+
+    try {
+      response = await fetch(url, {
+        method: "GET",
+        cache: "no-store",
+        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      });
+    } catch (error) {
+      if (attempt === MAX_REQUEST_ATTEMPTS || !isRetryableNetworkError(error)) {
+        throw error;
+      }
+
+      await wait(RETRY_DELAY_MS);
+      continue;
+    }
+
+    if (response.ok) return response;
+
+    if (
+      attempt < MAX_REQUEST_ATTEMPTS &&
+      RETRYABLE_STATUS_CODES.has(response.status)
+    ) {
+      await wait(RETRY_DELAY_MS);
+      continue;
+    }
+
+    throw new Error(`${errorMessage} (${response.status})`);
+  }
+
+  throw new Error(errorMessage);
+}
+
+// Fetch one page, optionally filtered by search, category, and sort.
+export async function getProducts(
+  page = 0,
+  size = 20,
+  filters: ProductPageFilters = {},
+): Promise<ProductPage> {
+  const API_URL = getBackendUrl();
   const params = new URLSearchParams({
     page: String(page),
     size: String(size),
@@ -30,69 +79,25 @@ function createPageParams(
   if (filters.category?.trim()) params.set("category", filters.category.trim());
   if (filters.sort?.trim()) params.set("sort", filters.sort.trim());
 
-  return params;
-}
-
-async function requestProductPage(
-  page: number,
-  size: number,
-  filters: ProductPageFilters = {},
-): Promise<ProductPage> {
-  const params = createPageParams(page, size, filters);
-  const response = await fetch(`${getProductsUrl()}?${params}`, {
-    cache: "no-store",
-    signal: AbortSignal.timeout(PRODUCT_LIST_TIMEOUT_MS),
-  });
-
-  return parseApiResponse<ProductPage>(response, "Failed to fetch products");
-}
-
-export async function getProductCatalog(
-  page = 0,
-  size = 12,
-  filters: ProductPageFilters = {},
-): Promise<ProductCatalog> {
-  const params = createPageParams(page, size, filters);
-  const response = await fetch(`${getProductsUrl()}/catalog?${params}`, {
-    cache: "no-store",
-    signal: AbortSignal.timeout(STOREFRONT_CATALOG_TIMEOUT_MS),
-  });
-
-  return parseApiResponse<ProductCatalog>(
-    response,
-    "Failed to fetch the product catalog",
+  const response = await fetchBackend(
+    `${API_URL}/products?${params}`,
+    "Failed to fetch products",
   );
+  return response.json();
 }
 
-export async function getProductPage(
-  page = 0,
-  size = 20,
+// Fetch every matching page. Remaining pages load concurrently.
+export async function getAllProducts(
   filters: ProductPageFilters = {},
-): Promise<ProductPage> {
-  return requestProductPage(page, size, filters);
-}
+): Promise<Product[]> {
+  const firstPage = await getProducts(0, 100, filters);
+  const requests: Promise<ProductPage>[] = [];
 
-export async function getProductById(id: string): Promise<Product> {
-  const response = await fetch(`${getProductsUrl()}/${encodeURIComponent(id)}`, {
-    cache: "no-store",
-    signal: AbortSignal.timeout(PRODUCT_DETAILS_TIMEOUT_MS),
-  });
-
-  return parseApiResponse<Product>(response, "Failed to fetch product");
-}
-
-async function requestAllProducts(): Promise<Product[]> {
-  const firstPage = await requestProductPage(0, ALL_PRODUCTS_PAGE_SIZE);
-
-  if (firstPage.totalPages <= 1) {
-    return firstPage.content;
+  for (let page = 1; page < firstPage.totalPages; page++) {
+    requests.push(getProducts(page, 100, filters));
   }
 
-  const remainingPages = await Promise.all(
-    Array.from({ length: firstPage.totalPages - 1 }, (_, index) =>
-      requestProductPage(index + 1, ALL_PRODUCTS_PAGE_SIZE),
-    ),
-  );
+  const remainingPages = await Promise.all(requests);
 
   return [
     ...firstPage.content,
@@ -100,27 +105,34 @@ async function requestAllProducts(): Promise<Product[]> {
   ];
 }
 
-function wait(milliseconds: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, milliseconds));
+// The storefront also needs category options from the catalog endpoint.
+export async function getProductCatalog(
+  page = 0,
+  size = 12,
+  filters: ProductPageFilters = {},
+): Promise<ProductCatalog> {
+  const API_URL = getBackendUrl();
+  const params = new URLSearchParams({
+    page: String(page),
+    size: String(size),
+  });
+
+  if (filters.query?.trim()) params.set("q", filters.query.trim());
+  if (filters.category?.trim()) params.set("category", filters.category.trim());
+  if (filters.sort?.trim()) params.set("sort", filters.sort.trim());
+
+  const response = await fetchBackend(
+    `${API_URL}/products/catalog?${params}`,
+    "Failed to fetch the product catalog",
+  );
+  return response.json();
 }
 
-// Used by the home and search pages. The storefront catalog above never retries.
-export async function getProducts(): Promise<Product[]> {
-  let lastError: unknown;
-
-  for (let attempt = 1; attempt <= ALL_PRODUCTS_MAX_ATTEMPTS; attempt++) {
-    try {
-      return await requestAllProducts();
-    } catch (error) {
-      lastError = error;
-
-      if (attempt < ALL_PRODUCTS_MAX_ATTEMPTS) {
-        await wait(ALL_PRODUCTS_RETRY_DELAY_MS);
-      }
-    }
-  }
-
-  throw lastError instanceof Error
-    ? lastError
-    : new Error("Unable to load products");
+export async function getProductById(id: string): Promise<Product> {
+  const API_URL = getBackendUrl();
+  const response = await fetchBackend(
+    `${API_URL}/products/${encodeURIComponent(id)}`,
+    "Failed to fetch product",
+  );
+  return response.json();
 }

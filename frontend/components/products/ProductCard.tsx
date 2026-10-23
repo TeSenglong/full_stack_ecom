@@ -66,7 +66,7 @@ export default function ProductCard({
           <Link
             href={productHref}
             aria-label={`${labels.view} ${name}`}
-            className="block h-full focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-primary"
+            className="block h-full focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary"
           >
             {productImage}
           </Link>

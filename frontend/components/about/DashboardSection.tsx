@@ -42,7 +42,6 @@ export default function DashboardSection() {
 
         <div data-aos="fade-up"
           data-aos-once="false"
-          data-aos-mirror="true"
           suppressHydrationWarning className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {DASHBOARD_FEATURES.map((feature, index) => (
             <article

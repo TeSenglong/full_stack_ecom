@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { unstable_rethrow } from "next/navigation";
 
 import ProductSearch from "@/components/products/ProductSearch";
-import { getProducts } from "@/lib/api/products";
+import { getAllProducts } from "@/lib/api/products";
 import type { Product } from "@/types/product";
 
 export const metadata: Metadata = {
@@ -21,7 +21,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   let loadError = false;
 
   try {
-    products = await getProducts();
+    products = await getAllProducts();
   } catch (error) {
     unstable_rethrow(error);
     console.error("Unable to load products for search:", error);

@@ -1,43 +1,46 @@
 import HomePage from "@/components/home/HomePage";
+import { getCategories } from "@/lib/api/categories";
 import { getProducts } from "@/lib/api/products";
-import type { ShowcaseProduct } from "@/types/product";
+import type { Category, ProductPage } from "@/types/product";
 import { unstable_rethrow } from "next/navigation";
 
-export default function Page() {
-  const productsPromise: Promise<ShowcaseProduct[]> = getProducts()
-    .then((data) =>
-      data.map((item) => {
-        const salePrice = item.discountPrice != null && item.discountPrice < item.price
-          ? item.discountPrice
-          : item.price;
-        const hasDiscount = salePrice < item.price;
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ category?: string | string[]; page?: string | string[] }>;
+}) {
+  const query = await searchParams;
+  const rawCategory = Array.isArray(query.category) ? query.category[0] : query.category;
+  const selectedCategory = rawCategory?.trim() || "all";
+  const rawPage = Array.isArray(query.page) ? query.page[0] : query.page;
+  const parsedPage = Number(rawPage ?? "1");
+  const requestedPage = Number.isSafeInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
 
-        return {
-          id: String(item.id),
-          name: item.name,
-          detail:
-            item.description || "Discover this item in our current catalog.",
-          price: salePrice,
-          originalPrice: hasDiscount ? item.price : undefined,
-          rating: item.averageRating,
-          reviews: item.reviewCount,
-          badge: hasDiscount ? "Sale" : undefined,
-          imageUrl:
-            item.imageUrl ??
-            "https://placehold.co/600x600/FBF9F6/14213D?text=Product",
-          stockQuantity: item.stockQuantity,
-          category:
-            typeof item.category === "object"
-              ? item.category.name
-              : item.category,
-        };
-      }),
-    )
-    .catch((error) => {
-      unstable_rethrow(error);
-      console.error("Unable to load products from the backend:", error);
-      return [];
-    });
+  const productsPromise: Promise<ProductPage | null> = getProducts(
+    requestedPage - 1,
+    10,
+    {
+      category: selectedCategory === "all" ? undefined : selectedCategory,
+      sort: "newest",
+    },
+  ).catch((error) => {
+    unstable_rethrow(error);
+    console.error("Unable to load products from the backend:", error);
+    return null;
+  });
 
-  return <HomePage productsPromise={productsPromise} />;
+  const categoriesPromise: Promise<Category[]> = getCategories().catch((error) => {
+    unstable_rethrow(error);
+    console.error("Unable to load home categories from the backend:", error);
+    return [];
+  });
+
+  return (
+    <HomePage
+      productsPromise={productsPromise}
+      categoriesPromise={categoriesPromise}
+      selectedCategory={selectedCategory}
+      requestedPage={requestedPage}
+    />
+  );
 }

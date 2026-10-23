@@ -3,65 +3,43 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense, use } from "react";
+import AOS from "aos";
+import { A11y, Keyboard, Pagination } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
 import { useLanguage } from "@/app/provider/languageProvider";
 
 import ProductShowcase from "@/components/home/ProductShowcase";
+import HeroReveal from "@/components/home/HeroReveal";
 import ProductSkeleton from "@/components/products/ProductSkeleton";
 import ProgressiveImage from "@/components/products/ProgressiveImage";
-import type { ShowcaseProduct } from "@/types/product";
+import type { Category, ProductPage } from "@/types/product";
 
-const SHOPPING_STEP_ICONS = ["search", "person", "add_shopping_cart", "receipt_long"];
+const SHOPPING_STEP_ICONS = [
+  "search",
+  "person",
+  "add_shopping_cart",
+  "receipt_long",
+];
 
 const FALLBACK_IMAGE =
   "https://lzfudmcajnsccibezqgb.supabase.co/storage/v1/object/public/image/Garments_arranged_on_dark_surface_20261008005847.jpg";
 const HOME_HERO_IMAGE = "/home.jpg";
 
 interface HomePageProps {
-  productsPromise: Promise<ShowcaseProduct[]>;
-}
-
-interface CategorySummary {
-  name: string;
-  count: number;
-  imageUrl: string;
-}
-
-function summarizeCategories(products: ShowcaseProduct[], otherLabel: string) {
-  const categoryMap = new Map<string, CategorySummary>();
-
-  for (const product of products) {
-    const categoryName = product.category?.trim() || otherLabel;
-    const existing = categoryMap.get(categoryName);
-
-    if (existing) {
-      existing.count += 1;
-      if (!existing.imageUrl && product.imageUrl) {
-        existing.imageUrl = product.imageUrl;
-      }
-    } else {
-      categoryMap.set(categoryName, {
-        name: categoryName,
-        count: 1,
-        imageUrl: product.imageUrl,
-      });
-    }
-  }
-
-  return categoryMap;
+  productsPromise: Promise<ProductPage | null>;
+  categoriesPromise: Promise<Category[]>;
+  selectedCategory: string;
+  requestedPage: number;
 }
 
 function HomeCategories({
-  productsPromise,
+  categoriesPromise,
 }: {
-  productsPromise: Promise<ShowcaseProduct[]>;
+  categoriesPromise: Promise<Category[]>;
 }) {
-  const { language, messages } = useLanguage();
+  const { messages } = useLanguage();
   const text = messages.home.categories;
-  const products = use(productsPromise);
-  const categories = Array.from(summarizeCategories(products, text.other).values()).slice(
-    0,
-    4,
-  );
+  const categories = use(categoriesPromise);
 
   if (categories.length === 0) {
     return (
@@ -69,43 +47,63 @@ function HomeCategories({
         <h3 className="font-serif text-2xl font-semibold text-primary">
           {text.emptyTitle}
         </h3>
-        <p className="mt-2 text-on-surface-variant">
-          {text.emptyDescription}
-        </p>
+        <p className="mt-2 text-on-surface-variant">{text.emptyDescription}</p>
       </div>
     );
   }
 
   return (
-    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+    <Swiper
+      modules={[A11y, Keyboard, Pagination]}
+      onAfterInit={() => requestAnimationFrame(() => AOS.refresh())}
+      onResize={() => requestAnimationFrame(() => AOS.refresh())}
+      spaceBetween={24}
+      slidesPerView={1}
+      slidesPerGroup={1}
+      pagination={{ clickable: true }}
+      keyboard={{ enabled: true, onlyInViewport: true }}
+      breakpoints={{
+        640: { slidesPerView: 2, slidesPerGroup: 2 },
+        1024: { slidesPerView: 4, slidesPerGroup: 4 },
+      }}
+      className="px-1! pb-14!"
+    >
       {categories.map((category) => (
-        <Link
-          key={category.name}
-          href={`/products?q=${encodeURIComponent(category.name)}`}
-          className="group overflow-hidden rounded-xl border border-primary/10 bg-surface-lowest shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
-        >
-          <ProgressiveImage
-            src={category.imageUrl || FALLBACK_IMAGE}
-            alt={`${category.name} — ${text.collection}`}
-            className="aspect-4/3 w-full transition-transform duration-500 group-hover:scale-105"
-          />
-          <div className="p-5">
-            <p className="text-xs font-semibold uppercase tracking-widest text-secondary">
-              {category.count} {category.count === 1 ? text.product : text.products}
-            </p>
-            <h3
-              lang={category.name === text.other ? (language === "kh" ? "km" : "en") : "en"}
-              className="catalog-content mt-1 font-serif text-2xl font-semibold text-primary"
+        <SwiperSlide key={category.id} className="h-auto!">
+          <div
+            data-aos="fade-up"
+            data-aos-once="false"
+            suppressHydrationWarning
+            className="h-full w-full"
+          >
+            <Link
+              href={`/products?category=${encodeURIComponent(category.name)}`}
+              className="group block h-full overflow-hidden rounded-xl border border-primary/10 bg-surface-lowest shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
             >
-              {category.name}
-            </h3>
-            <p className="mt-2 text-sm text-on-surface-variant">
-              {text.viewProducts}
-            </p>
+              <ProgressiveImage
+                src={category.imageUrl || FALLBACK_IMAGE}
+                alt={`${category.name} — ${text.collection}`}
+                className="aspect-4/3 w-full transition-transform duration-500 group-hover:scale-105"
+              />
+              <div className="p-5">
+                <p className="text-xs font-semibold uppercase tracking-widest text-secondary">
+                  {text.collection}
+                </p>
+                <h3
+                  lang="en"
+                  className="catalog-content mt-1 font-serif text-2xl font-semibold text-primary"
+                >
+                  {category.name}
+                </h3>
+                <p className="mt-2 text-sm text-on-surface-variant">
+                  {text.viewProducts}
+                </p>
+              </div>
+            </Link>
           </div>
-        </Link>
+        </SwiperSlide>
       ))}
-    </div>
+    </Swiper>
   );
 }
 
@@ -131,12 +129,23 @@ function HomeCategoriesLoading() {
 
 function HomeProductShowcase({
   productsPromise,
+  categoriesPromise,
+  selectedCategory,
 }: {
-  productsPromise: Promise<ShowcaseProduct[]>;
+  productsPromise: Promise<ProductPage | null>;
+  categoriesPromise: Promise<Category[]>;
+  selectedCategory: string;
 }) {
-  const products = use(productsPromise);
+  const productPage = use(productsPromise);
+  const categories = use(categoriesPromise);
 
-  return <ProductShowcase products={products} />;
+  return (
+    <ProductShowcase
+      productPage={productPage}
+      categories={categories}
+      selectedCategory={selectedCategory}
+    />
+  );
 }
 
 function HomeProductShowcaseLoading() {
@@ -152,9 +161,7 @@ function HomeProductShowcaseLoading() {
           <h2 className="mt-1 font-serif text-[32px] font-semibold text-primary">
             {text.title}
           </h2>
-          <p className="mt-2 text-sm text-on-surface-variant">
-            {text.loading}
-          </p>
+          <p className="mt-2 text-sm text-on-surface-variant">{text.loading}</p>
         </div>
       </div>
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -166,7 +173,12 @@ function HomeProductShowcaseLoading() {
   );
 }
 
-export default function HomePage({ productsPromise }: HomePageProps) {
+export default function HomePage({
+  productsPromise,
+  categoriesPromise,
+  selectedCategory,
+  requestedPage,
+}: HomePageProps) {
   const { language, messages } = useLanguage();
   const { hero, categories, experience, cta } = messages.home;
 
@@ -176,7 +188,6 @@ export default function HomePage({ productsPromise }: HomePageProps) {
       className="localized-content w-full bg-surface font-sans text-on-surface antialiased"
     >
       <main className="w-full">
-
         <section className="mx-auto max-w-350 px-5 pb-14 pt-6 md:px-8 md:pb-20 md:pt-8 lg:px-12 lg:pb-24 lg:pt-10">
           <div className="grid items-stretch gap-12 lg:grid-cols-12">
             <div className="flex flex-col lg:col-span-6">
@@ -193,10 +204,7 @@ export default function HomePage({ productsPromise }: HomePageProps) {
                 {hero.description}
               </p>
 
-              <div data-aos="fade-up"
-                data-aos-once="false"
-                data-aos-mirror="true"
-                suppressHydrationWarning className="mt-8 flex flex-col gap-3 sm:flex-row lg:mt-auto lg:pt-10">
+              <HeroReveal className="mt-8 flex flex-col gap-3 sm:flex-row lg:mt-auto lg:pt-10">
                 <Link
                   href="/products"
                   className="rounded-md bg-primary px-8 py-3.5 text-center text-sm font-semibold uppercase tracking-[0.07em] text-on-primary shadow-sm transition-opacity hover:opacity-90"
@@ -212,7 +220,7 @@ export default function HomePage({ productsPromise }: HomePageProps) {
                     arrow_downward
                   </span>
                 </Link>
-              </div>
+              </HeroReveal>
             </div>
 
             <div className="lg:col-span-6">
@@ -229,17 +237,14 @@ export default function HomePage({ productsPromise }: HomePageProps) {
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-black/75 via-black/5 to-transparent" />
-                <div data-aos="fade-up"
-                  data-aos-once="false"
-                  data-aos-mirror="true"
-                  suppressHydrationWarning className="absolute inset-x-0 bottom-0 p-7 text-white md:p-9">
+                <HeroReveal className="absolute inset-x-0 bottom-0 p-7 text-white md:p-9">
                   <p className="text-xs font-semibold uppercase tracking-[0.12em] text-white/75">
                     {hero.featuredCollection}
                   </p>
                   <h2 className="mt-2 font-serif text-3xl font-semibold">
                     {hero.exploreLatest}
                   </h2>
-                </div>
+                </HeroReveal>
               </Link>
             </div>
           </div>
@@ -269,17 +274,29 @@ export default function HomePage({ productsPromise }: HomePageProps) {
             </div>
 
             <Suspense fallback={<HomeCategoriesLoading />}>
-              <HomeCategories productsPromise={productsPromise} />
+              <HomeCategories categoriesPromise={categoriesPromise} />
             </Suspense>
           </div>
         </section>
 
-        <Suspense fallback={<HomeProductShowcaseLoading />}>
-          <HomeProductShowcase productsPromise={productsPromise} />
+        <Suspense
+          key={`${selectedCategory}:${requestedPage}`}
+          fallback={<HomeProductShowcaseLoading />}
+        >
+          <HomeProductShowcase
+            productsPromise={productsPromise}
+            categoriesPromise={categoriesPromise}
+            selectedCategory={selectedCategory}
+          />
         </Suspense>
 
         <section className="bg-brand-panel py-20 text-on-brand">
-          <div className="mx-auto max-w-350 px-5 md:px-8 lg:px-12">
+          <div
+            data-aos="fade-up"
+            data-aos-once="false"
+            suppressHydrationWarning
+            className="mx-auto max-w-350 px-5 md:px-8 lg:px-12"
+          >
             <div className="max-w-3xl">
               <span className="text-xs font-semibold uppercase tracking-[0.12em] text-[#ffb59d]">
                 {experience.eyebrow}
@@ -327,9 +344,7 @@ export default function HomePage({ productsPromise }: HomePageProps) {
               <h2 className="mt-2 max-w-2xl font-serif text-4xl font-semibold text-primary">
                 {cta.title}
               </h2>
-              <p className="mt-3 text-on-surface-variant">
-                {cta.description}
-              </p>
+              <p className="mt-3 text-on-surface-variant">{cta.description}</p>
             </div>
             <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
               <Link

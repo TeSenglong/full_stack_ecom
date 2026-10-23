@@ -4,13 +4,51 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* @media (prefers-reduced-motion: reduce) {
+.hero-enter {
+  opacity: 1;
+  transform: none;
+}
+
+.hero-enter[data-reveal="pending"] {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+.hero-enter[data-reveal="visible"] {
+  animation: hero-enter 700ms ease-out both;
+}
+
+@keyframes hero-enter {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Keep content visible while AOS JavaScript is still loading. */
+[data-aos]:not(.aos-init) {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-enter {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+
   [data-aos] {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
   }
-} */
+}
 
 @theme {
   --font-sans: "Hanken Grotesk", system-ui, sans-serif;
