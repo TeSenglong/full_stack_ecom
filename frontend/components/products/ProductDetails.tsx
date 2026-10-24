@@ -91,7 +91,7 @@ export default function ProductDetails({ product }: { product: Product }) {
                 disabled={!inStock}
                 showIcon
                 label="Cart"
-                className="flex-1 cursor-pointer rounded-md bg-primary px-6 py-3 font-medium text-on-primary transition-all hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex-1 cursor-pointer rounded-md bg-secondary px-6 py-3 font-medium text-on-secondary transition-all hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
               />
               <button type="button" aria-label="Add to wishlist" className="cursor-pointer rounded-md border border-primary/15 px-4 transition-colors hover:bg-primary/5">♡</button>
             </div>

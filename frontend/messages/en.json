@@ -157,7 +157,7 @@
       { "title": "Shop", "links": ["New Releases", "All Products", "Browse Categories", "Furniture & Living", "Tailored Apparel", "Ceramics & Objects"] },
       { "title": "About", "links": ["Our Philosophy", "Our Story", "Our Values", "The Collection"] },
       { "title": "Client Services", "links": ["Order Tracking", "Custom Commissions", "Care & Restoration", "Returns Policy"] },
-      { "title": "Sustainability", "links": ["Material Provenance", "Carbon Ledger", "Circular Repair", "2024 Impact Dossier"] }
+      { "title": "Contact", "links": ["Facebook", "Email", "Phone or message", "GitHub"] }
     ],
     "countryCurrency": "Country and currency",
     "countries": ["United States (USD $)", "United Kingdom (GBP £)", "European Union (EUR €)", "Japan (JPY ¥)"],

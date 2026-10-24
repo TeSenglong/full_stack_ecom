@@ -159,7 +159,7 @@ export function SignupForm({
         {error && <FieldError>{error}</FieldError>}
 
         <Field>
-          <Button type="submit" disabled={submitting}>
+          <Button type="submit" variant="secondary" disabled={submitting}>
             {submitting && <LoaderCircle className="size-4 animate-spin" />}
             {submitting ? "Creating account..." : "Create Account"}
           </Button>

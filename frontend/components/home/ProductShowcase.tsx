@@ -99,7 +99,7 @@ export default function ProductShowcase({
           <button
             type="button"
             onClick={() => startTransition(() => router.refresh())}
-            className="mt-4 cursor-pointer rounded bg-primary px-6 py-2 text-[13px] font-medium uppercase text-on-primary"
+            className="mt-4 cursor-pointer rounded bg-secondary px-6 py-2 text-[13px] font-medium uppercase text-on-secondary"
           >
             {text.retry}
           </button>
@@ -111,7 +111,7 @@ export default function ProductShowcase({
             <button
               type="button"
               onClick={() => navigateTo("all")}
-              className="mt-4 cursor-pointer rounded bg-primary px-6 py-2 text-[13px] font-medium uppercase text-on-primary"
+              className="mt-4 cursor-pointer rounded bg-secondary px-6 py-2 text-[13px] font-medium uppercase text-on-secondary"
             >
               {text.showAll}
             </button>

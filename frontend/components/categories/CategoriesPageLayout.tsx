@@ -18,7 +18,7 @@ export default function CategoriesPageLayout({ children }: { children: ReactNode
             </p>
             <Link
               href="/products"
-              className="mt-8 inline-flex items-center gap-2 rounded-md bg-primary px-6 py-3 text-sm font-semibold text-on-primary transition-opacity hover:opacity-90"
+              className="mt-8 inline-flex items-center gap-2 rounded-md bg-secondary px-6 py-3 text-sm font-semibold text-on-secondary transition-opacity hover:opacity-90"
             >
               View all products
               <span className="material-symbols-outlined text-lg">east</span>

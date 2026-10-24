@@ -162,7 +162,7 @@ export default function MainHeader() {
             className="relative cursor-pointer p-1 transition-opacity hover:opacity-70"
           >
             <span className="material-symbols-outlined">shopping_bag</span>
-            <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[9px] text-on-primary">
+            <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-secondary text-[9px] text-on-secondary">
               {cartLoading
                 ? "·"
                 : cart.totalItems > 99

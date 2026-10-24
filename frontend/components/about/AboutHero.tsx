@@ -13,13 +13,13 @@ export default function AboutHero() {
       <div className="grid min-h-165 overflow-hidden rounded-xl bg-brand-panel lg:grid-cols-2">
         <div className="flex flex-col justify-center px-7 py-14 text-on-brand md:px-14 lg:px-16">
           <div className="mb-5 flex items-center gap-3">
-            <span className="h-px w-10 bg-[#ffb59d]" />
-            <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-[#ffb59d]">{text.eyebrow}</span>
+            <span className="h-px w-10 bg-brand-accent" />
+            <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-brand-accent">{text.eyebrow}</span>
           </div>
           <h1 className="max-w-xl font-serif text-5xl font-semibold leading-[1.02] tracking-tight md:text-7xl">{text.title}</h1>
           <p className="mt-7 max-w-lg text-[17px] leading-relaxed text-on-brand/80">{text.description}</p>
           <div className="mt-9 flex flex-wrap gap-4">
-            <Link href="/products" className="rounded bg-[#f4f0e9] px-6 py-3 text-sm font-semibold text-[#26332c]">{text.exploreProducts}</Link>
+            <Link href="/products" className="rounded bg-secondary px-6 py-3 text-sm font-semibold text-on-secondary">{text.exploreProducts}</Link>
             <a href="#story" className="flex items-center gap-2 px-2 py-3 text-sm font-semibold">{text.readStory} <span className="material-symbols-outlined text-[17px]">south</span></a>
           </div>
         </div>

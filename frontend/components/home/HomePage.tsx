@@ -207,7 +207,7 @@ export default function HomePage({
               <HeroReveal className="mt-8 flex flex-col gap-3 sm:flex-row lg:mt-auto lg:pt-10">
                 <Link
                   href="/products"
-                  className="rounded-md bg-primary px-8 py-3.5 text-center text-sm font-semibold uppercase tracking-[0.07em] text-on-primary shadow-sm transition-opacity hover:opacity-90"
+                  className="rounded-md bg-secondary px-8 py-3.5 text-center text-sm font-semibold uppercase tracking-[0.07em] text-on-secondary shadow-sm transition-opacity hover:opacity-90"
                 >
                   {hero.shopProducts}
                 </Link>
@@ -298,7 +298,7 @@ export default function HomePage({
             className="mx-auto max-w-350 px-5 md:px-8 lg:px-12"
           >
             <div className="max-w-3xl">
-              <span className="text-xs font-semibold uppercase tracking-[0.12em] text-[#ffb59d]">
+              <span className="text-xs font-semibold uppercase tracking-[0.12em] text-brand-accent">
                 {experience.eyebrow}
               </span>
               <h2 className="mt-2 font-serif text-4xl font-semibold md:text-5xl">
@@ -316,7 +316,7 @@ export default function HomePage({
                   className="rounded-xl border border-white/10 bg-white/5 p-6"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="material-symbols-outlined text-3xl text-[#ffb59d]">
+                    <span className="material-symbols-outlined text-3xl text-brand-accent">
                       {SHOPPING_STEP_ICONS[index]}
                     </span>
                     <span className="text-xs font-semibold text-white/45">
@@ -349,7 +349,7 @@ export default function HomePage({
             <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
               <Link
                 href="/products"
-                className="rounded-md bg-primary px-7 py-3 text-center text-sm font-semibold text-on-primary"
+                className="rounded-md bg-secondary px-7 py-3 text-center text-sm font-semibold text-on-secondary"
               >
                 {cta.browseProducts}
               </Link>

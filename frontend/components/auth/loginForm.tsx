@@ -127,6 +127,7 @@ export function LoginForm({ className }: LoginFormProps) {
                 <Field>
                     <Button
                         type="submit"
+                        variant="secondary"
                         className="h-10 w-full"
                         disabled={submitting}
                     >

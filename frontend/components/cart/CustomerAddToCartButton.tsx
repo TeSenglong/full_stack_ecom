@@ -136,7 +136,7 @@ export function CustomerAddToCartButton({
     return (
       <div
         className={cn(
-          "inline-flex h-10 items-center overflow-hidden rounded-md border border-primary/15 bg-surface-lowest text-primary shadow-sm",
+          "inline-flex h-10 items-center overflow-hidden rounded-md border border-secondary/30 bg-secondary/10 text-secondary shadow-sm",
           showIcon && "flex-1",
         )}
         onClick={(event) => event.stopPropagation()}
@@ -152,7 +152,7 @@ export function CustomerAddToCartButton({
         >
           <Minus className="size-4" />
         </button>
-        <span className="flex min-w-14 flex-1 items-center justify-center gap-1.5 border-x border-primary/10 px-2 text-sm font-semibold tabular-nums">
+        <span className="flex min-w-14 flex-1 items-center justify-center gap-1.5 border-x border-secondary/20 px-2 text-sm font-semibold tabular-nums">
           {submitting ? (
             <LoaderCircle className="size-4 animate-spin" />
           ) : (
@@ -182,7 +182,7 @@ export function CustomerAddToCartButton({
       onKeyDown={(event) => event.stopPropagation()}
       disabled={isDisabled}
       className={cn(
-        "inline-flex cursor-pointer items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-on-primary transition-all hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-45",
+        "inline-flex cursor-pointer items-center justify-center gap-2 rounded-md bg-secondary px-4 py-2 text-sm font-medium text-on-secondary transition-all hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-45",
         className,
       )}
     >

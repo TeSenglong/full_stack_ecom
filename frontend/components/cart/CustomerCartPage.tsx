@@ -307,7 +307,7 @@ export default function CustomerCartPage() {
           </div>
           <Link
             href="/checkout"
-            className="mt-6 flex w-full items-center justify-center gap-2 rounded-md bg-primary px-5 py-3.5 font-medium text-on-primary transition-opacity hover:opacity-90"
+            className="mt-6 flex w-full items-center justify-center gap-2 rounded-md bg-secondary px-5 py-3.5 font-medium text-on-secondary transition-opacity hover:opacity-90"
           >
             Continue to checkout
             <ArrowRight className="size-4" />

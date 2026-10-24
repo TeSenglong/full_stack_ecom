@@ -23,10 +23,10 @@ export default function ProductsPageLayout({ children }: { children: ReactNode }
       <section className="mx-auto max-w-350 px-5 pb-20 md:px-8 lg:px-12">
         <div className="flex flex-col items-start justify-between gap-6 rounded-lg bg-brand-panel p-8 text-on-brand shadow-sm md:flex-row md:items-center md:p-12">
           <div>
-            <span className="text-[11px] uppercase tracking-[0.12em] text-[#ffb59d]">Our approach</span>
+            <span className="text-[11px] uppercase tracking-[0.12em] text-brand-accent">Our approach</span>
             <h2 className="mt-1 font-serif text-3xl font-semibold">Meet the hands behind the collection.</h2>
           </div>
-          <Link href="/about" prefetch={false} className="rounded bg-[#f4f0e9] px-6 py-3 text-sm font-semibold text-[#26332c] transition-colors hover:bg-white">
+          <Link href="/about" prefetch={false} className="rounded bg-secondary px-6 py-3 text-sm font-semibold text-on-secondary transition-colors hover:bg-secondary/90">
             Discover MOHAORI
           </Link>
         </div>

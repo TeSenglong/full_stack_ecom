@@ -306,7 +306,7 @@ export default function CustomerCheckoutPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="mt-6 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-md bg-primary px-5 py-3.5 font-medium text-on-primary transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+            className="mt-6 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-md bg-secondary px-5 py-3.5 font-medium text-on-secondary transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {submitting ? (
               <LoaderCircle className="size-4 animate-spin" />
