@@ -34,11 +34,27 @@ const headingFont = Newsreader({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://frontend-eta-woad-54.vercel.app"),
   title: "MOHAORI — Fashion and Everyday Essentials",
   description:
-    "Shop clothing, footwear, accessories, souvenirs, and everyday products from MOHAORI.",
-};
+    "Discover clothing, footwear, accessories, and everyday essentials at MOHAORI.",
 
+  openGraph: {
+    type: "website",
+    siteName: "MOHAORI",
+    title: "MOHAORI — Fashion and Everyday Essentials",
+    description:
+      "Discover clothing, footwear, accessories, and everyday essentials at MOHAORI.",
+    images: [
+      {
+        url: "/page.png",
+        width: 1200,
+        height: 630,
+        alt: "MOHAORI collection",
+      },
+    ],
+  },
+};
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
