@@ -134,10 +134,32 @@ export function CustomerAddToCartButton({
 
   if (cartItem) {
     return (
+      <>
+      {mobileIconOnly && (
+        <button
+          type="button"
+          aria-label={`${cartItem.quantity} ${cartItem.productName} in cart. Add one more`}
+          onClick={(event) => {
+            event.stopPropagation();
+            changeCartQuantity(cartItem.quantity + 1);
+          }}
+          onKeyDown={(event) => event.stopPropagation()}
+          disabled={isDisabled || cartItem.quantity >= cartItem.stockQuantity}
+          className="inline-flex h-10 shrink-0 items-center justify-center gap-1 rounded-md border border-secondary/30 bg-secondary/10 px-2 text-sm font-semibold tabular-nums text-secondary transition-colors hover:bg-surface-high disabled:cursor-not-allowed disabled:opacity-40 sm:hidden"
+        >
+          {submitting ? (
+            <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
+          ) : (
+            <ShoppingBag className="size-4" aria-hidden="true" />
+          )}
+          {cartItem.quantity}
+        </button>
+      )}
       <div
         className={cn(
           "inline-flex h-10 items-center overflow-hidden rounded-md border border-secondary/30 bg-secondary/10 text-secondary shadow-sm",
           showIcon && "flex-1",
+          mobileIconOnly && "hidden sm:inline-flex",
         )}
         onClick={(event) => event.stopPropagation()}
         onKeyDown={(event) => event.stopPropagation()}
@@ -172,6 +194,7 @@ export function CustomerAddToCartButton({
           <Plus className="size-4" />
         </button>
       </div>
+      </>
     );
   }
 
@@ -188,7 +211,7 @@ export function CustomerAddToCartButton({
     >
       {submitting ? (
         <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
-      ) : disabled ? null : (
+      ) : (
         <Plus className="size-4" aria-hidden="true" />
       )}
       {showIcon && !submitting && !disabled && (
@@ -196,7 +219,7 @@ export function CustomerAddToCartButton({
       )}
       <span
         className={cn(
-          mobileIconOnly && !disabled && "sr-only sm:not-sr-only",
+          mobileIconOnly && "sr-only sm:not-sr-only",
         )}
       >
         {disabled

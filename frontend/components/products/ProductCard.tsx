@@ -80,7 +80,7 @@ export default function ProductCard({
 
       <div className="flex flex-1 flex-col p-3 sm:p-5">
         <p lang={categoryLanguage === "kh" ? "km" : "en"} className="catalog-content mb-1 hidden text-xs uppercase tracking-wide text-on-surface-variant sm:block">{category}</p>
-        <h3 lang="en" className="mb-1.5 line-clamp-2 min-h-10 font-serif text-sm font-semibold leading-snug text-primary sm:min-h-0 sm:text-lg">
+        <h3 lang="en" className="mb-0 line-clamp-2 min-h-10 font-serif text-sm font-semibold leading-snug text-primary sm:min-h-0 sm:text-lg">
           {productHref ? (
             <Link href={productHref} className="rounded-sm hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
               {name}
