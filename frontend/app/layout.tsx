@@ -40,6 +40,7 @@ export const metadata: Metadata = {
     "Discover clothing, footwear, accessories, and everyday essentials at MOHAORI.",
 
   openGraph: {
+    url: "https://frontend-eta-woad-54.vercel.app/",
     type: "website",
     siteName: "MOHAORI",
     title: "MOHAORI — Fashion and Everyday Essentials",
