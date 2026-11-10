@@ -90,7 +90,7 @@ class ProductServiceIntegrationTests {
 		assertThat(updated.sku()).isEqualTo(created.sku());
 		assertThat(updated.releaseDate()).isEqualTo(LocalDate.of(2026, 8, 25));
 		assertThat(updated.category().id()).isEqualTo(computers.id());
-		assertThat(productService.getAll(0, 20).content()).hasSize(1);
+		assertThat(productService.getAll(0, 20, null, null, "featured").content()).hasSize(1);
 
 		productService.delete(created.id());
 

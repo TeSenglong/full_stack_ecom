@@ -52,11 +52,6 @@ public class ProductService {
 	}
 
 	@Transactional(readOnly = true)
-	public PageResponse<ProductResponse> getAll(int page, int size) {
-		return getAll(page, size, null, null, "featured");
-	}
-
-	@Transactional(readOnly = true)
 	public PageResponse<ProductResponse> getAll(
 			int page,
 			int size,
